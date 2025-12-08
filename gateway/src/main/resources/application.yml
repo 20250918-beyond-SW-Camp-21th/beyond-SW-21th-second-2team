@@ -24,7 +24,7 @@ spring:
             - id: attendance-tracking
               uri: lb://attendance-tracking
               predicates:
-                - Path=/api/v1/approval-system/**
+                - Path=/api/v1/attendance-tracking/**
               filters:
                 - RewritePath=/api/v1/attendance-tracking/(?<segment>.*), /$\{segment}
             - id: communication-and-alarm
@@ -39,18 +39,14 @@ spring:
                 - Path=/api/v1/resource-reservation/**
               filters:
                 - RewritePath=/api/v1/resource-reservation/(?<segment>.*), /$\{segment}
-            - id: EurekaServer
-              uri: lb://eureka-server
-              predicates:
-                - Path=/api/v1/eureka-server/**
-              filters:
-                - RewritePath=/api/v1/eureka-server/(?<segment>.*), /$\{segment}
+
 
 eureka:
+
   client:
     fetch-registry: true
     register-with-eureka: true
     service-url:
-      defaultZone: http://localhost:8766/eureka
+      defaultZone: http://localhost:8761/eureka
 jwt:
   secret: +i12AQFwws/Del1pGAOB0imXQLGaCNd7dyMF41Mxe6k=
