@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/document")
+@RequestMapping("/document")
 @RequiredArgsConstructor
 public class DocumentController {
 
@@ -30,26 +30,44 @@ public class DocumentController {
     }
 
     @PutMapping("/{docId}")
-    public ResponseEntity<ApiResponse> updateDocument(Long memberId, @PathVariable Long docId, @RequestBody @Valid UpdateDocumentRequestDto requestDto) {
+    public ResponseEntity<ApiResponse> updateDocument(/*Long memberId*/ @PathVariable Long docId, @RequestBody @Valid UpdateDocumentRequestDto requestDto) {
+        Long memberId = 1L;
         documentService.updateDocument(memberId, docId, requestDto);
         return ResponseEntity.ok(ApiResponse.success("기안 수정 완료"));
     }
 
     @DeleteMapping("/{docId}")
-    public ResponseEntity<ApiResponse> deleteDocument(Long memberId, @PathVariable Long docId) {
+    public ResponseEntity<ApiResponse> deleteDocument(/*Long memberId,*/ @PathVariable Long docId) {
+        Long memberId = 1L;
         documentService.deleteDocument(memberId, docId);
         return ResponseEntity.ok(ApiResponse.success("기안 삭제 완료"));
     }
 
     @GetMapping("/{docId}")
-    public ResponseEntity<ApiResponse> getDocumentDetail(Long memberId, @PathVariable Long docId) {
+    public ResponseEntity<ApiResponse> getDocumentDetail(/*Long memberId,*/ @PathVariable Long docId) {
+        Long memberId = 1L;
         DocumentDetailResponseDto response = documentService.readDetailDocument(memberId, docId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @GetMapping("/drafts")
-    public ResponseEntity<ApiResponse> getDocumentList(Long memberId, Pageable pageable) {
+    public ResponseEntity<ApiResponse> getTempDocumentList(/*Long memberId,*/ Pageable pageable) {
+        Long memberId = 1L;
         Page<DocumentListResponseDto> documentList = documentService.getTempDocumentList(memberId, pageable);
+        return ResponseEntity.ok(ApiResponse.success(documentList));
+    }
+
+    @GetMapping("/progress")
+    public ResponseEntity<ApiResponse> getProgressDocumentList(/*Long memberId,*/ Pageable pageable) {
+        Long memberId = 1L;
+        Page<DocumentListResponseDto> documentList = documentService.getProgressDocumentList(memberId, pageable);
+        return ResponseEntity.ok(ApiResponse.success(documentList));
+    }
+
+    @GetMapping("/closed")
+    public ResponseEntity<ApiResponse> getClosedDocumentList(/*Long memberId,*/ Pageable pageable) {
+        Long memberId = 1L;
+        Page<DocumentListResponseDto> documentList = documentService.getClosedDocumentList(memberId, pageable);
         return ResponseEntity.ok(ApiResponse.success(documentList));
     }
 }
