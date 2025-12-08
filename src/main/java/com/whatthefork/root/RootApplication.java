@@ -1,13 +1,13 @@
-package com.whatthefork.resourcereservationservice;
+package com.whatthefork.root;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ResourceReservationServiceApplication {
+public class RootApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ResourceReservationServiceApplication.class, args);
+        SpringApplication.run(RootApplication.class, args);
     }
 
 }

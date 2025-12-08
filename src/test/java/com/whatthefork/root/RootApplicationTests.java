@@ -1,10 +1,10 @@
-package com.whatthefork.resourcereservationservice;
+package com.whatthefork.root;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ResourceReservationServiceApplicationTests {
+class RootApplicationTests {
 
     @Test
     void contextLoads() {
