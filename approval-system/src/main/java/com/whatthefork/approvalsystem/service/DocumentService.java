@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 /* 12.06 UserDetails 부분이 완성이 되면 모든 메소드의 Long userId는 Userdetials로 교체할 것 */
@@ -171,6 +172,26 @@ public class DocumentService {
     public Page<DocumentListResponseDto> getTempDocumentList(Long memberId, Pageable pageable) {
         Page<ApprovalDocument> documentList = approvalDocumentRepository.findByDocStatusAndDrafterOrderByCreatedAtDesc(DocStatusEnum.TEMP, memberId, pageable);
 
+        return getResponseDto(documentList);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<DocumentListResponseDto> getProgressDocumentList(Long memberId, Pageable pageable) {
+        Page<ApprovalDocument> documentList = approvalDocumentRepository.findByDocStatusAndDrafterOrderByCreatedAtDesc(DocStatusEnum.IN_PROGRESS, memberId, pageable);
+
+        return getResponseDto(documentList);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<DocumentListResponseDto> getClosedDocumentList(Long memberId, Pageable pageable) {
+        List<DocStatusEnum> statuses = Arrays.asList(DocStatusEnum.APPROVED, DocStatusEnum.REJECTED);
+        Page<ApprovalDocument> documentList = approvalDocumentRepository.findByDrafterAndDocStatusInOrderByCreatedAtDesc(memberId, statuses, pageable);
+
+        return getResponseDto(documentList);
+    }
+
+    private Page<DocumentListResponseDto> getResponseDto(Page<ApprovalDocument> documentList) {
+
         return documentList.map(document ->
                 DocumentListResponseDto.builder()
                         .documentId(document.getId())
@@ -178,7 +199,7 @@ public class DocumentService {
                         .status(document.getDocStatus())
                         .createdDate(document.getCreatedAt())
                         .build()
-        );
+                );
     }
 
     private ApprovalDocument validateUpdateAuthority(Long userId, Long docId) {
