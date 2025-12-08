@@ -185,7 +185,7 @@ public class DocumentService {
     @Transactional(readOnly = true)
     public Page<DocumentListResponseDto> getClosedDocumentList(Long memberId, Pageable pageable) {
         List<DocStatusEnum> statuses = Arrays.asList(DocStatusEnum.APPROVED, DocStatusEnum.REJECTED);
-        Page<ApprovalDocument> documentList = approvalDocumentRepository.findByDocStatusAndDocStatusIn(memberId, statuses, pageable);
+        Page<ApprovalDocument> documentList = approvalDocumentRepository.findByDrafterAndDocStatusInOrderByCreatedAtDesc(memberId, statuses, pageable);
 
         return getResponseDto(documentList);
     }
