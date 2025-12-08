@@ -1,0 +1,33 @@
+server:
+  port: 0
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8766/eureka
+
+spring:
+  application:
+    name: resource-reservation
+  datasource:
+    url: jdbc:mysql://dev.macacolabs.site:3307/approval_db
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: mysql@
+  jpa:
+    properties:
+      hibernate:
+        highlight_sql: true
+        format-sql: true
+        use_sql_comments: true
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+logging:
+  level:
+    org.hibernate.orm.jdbc.bind: trace
