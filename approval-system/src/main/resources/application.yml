@@ -1,8 +1,18 @@
-#spring.application.name=approval-system
+server:
+  port: 0
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8766/eureka
 
 spring:
   application:
-    name: Resource Reservation Service
+    name: approval-system
   datasource:
     url: jdbc:mysql://dev.macacolabs.site:3307/approval_db
     driver-class-name: com.mysql.cj.jdbc.Driver

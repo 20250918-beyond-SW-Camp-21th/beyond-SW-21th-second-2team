@@ -1,1 +1,3 @@
 rootProject.name = 'eurekaserver'
+include 'eureka-server'
+include 'approval-system'
