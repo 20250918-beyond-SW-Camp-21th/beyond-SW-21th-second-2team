@@ -5,7 +5,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,5 +35,9 @@ public class ApprovalReferrer {
         this.document = document;
         this.referrer = referrer;
         this.viewedAt = viewedAt;
+    }
+
+    public void updateViewedAt() {
+        this.viewedAt = LocalDateTime.now();
     }
 }
