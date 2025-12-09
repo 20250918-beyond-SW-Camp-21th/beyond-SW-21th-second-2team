@@ -71,4 +71,25 @@ public class DocumentController {
         Page<DocumentListResponseDto> documentList = documentService.getClosedDocumentList(memberId, pageable);
         return ResponseEntity.ok(ApiResponse.success(documentList));
     }
+
+    @GetMapping("/pending")
+    public ResponseEntity<ApiResponse> getDocumentsToApprove(/*Long memberId*/ Pageable pageable) {
+        Long memberId = 101L;
+        Page<DocumentListResponseDto> documentList = documentService.getDocumentsToApprove(memberId, pageable);
+        return ResponseEntity.ok(ApiResponse.success(documentList));
+    }
+
+    @GetMapping("/processed")
+    public ResponseEntity<ApiResponse> getProcessedDocuments(/*Long memberId*/ Pageable pageable) {
+        Long memberId = 101L;
+        Page<DocumentListResponseDto> documentList = documentService.getProcessedDocuments(memberId, pageable);
+        return ResponseEntity.ok(ApiResponse.success(documentList));
+    }
+
+    @GetMapping("/referenced")
+    public ResponseEntity<ApiResponse> getReferencedDocuments(/*Long memberId*/ Pageable pageable) {
+        Long memberId = 101L;
+        Page<DocumentListResponseDto> documentList = documentService.getReferencedDocuments(memberId, pageable);
+        return ResponseEntity.ok(ApiResponse.success(documentList));
+    }
 }
