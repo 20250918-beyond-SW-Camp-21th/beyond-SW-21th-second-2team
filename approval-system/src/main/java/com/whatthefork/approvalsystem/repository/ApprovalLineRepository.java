@@ -26,4 +26,8 @@ public interface ApprovalLineRepository extends JpaRepository<ApprovalLine, Long
     void updateLineStatusByDocumentAndSequence(Long docId, int sequence, LineStatusEnum lineStatusEnum);
 
     Optional<ApprovalLine> findByDocumentAndSequence(Long docId, int sequence);
+
+    Optional<ApprovalLine> findByDocumentAndApprover(Long document, Long approver);
+
+    boolean existsByDocumentAndApprover(Long document, Long approver);
 }

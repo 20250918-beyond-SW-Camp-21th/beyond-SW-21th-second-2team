@@ -35,7 +35,7 @@ public class ApprovalHistory {
     private Long actor;
 
     @Column(nullable = false)
-    private LocalDateTime openDate;
+    private LocalDateTime viewedAt;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -53,7 +53,7 @@ public class ApprovalHistory {
     public ApprovalHistory(Long document, Long actor, ActionTypeEnum actionType, String comment, ApprovalHistory parent) {
         this.document = document;
         this.actor = actor;
-        this.openDate = LocalDateTime.now();
+        this.viewedAt = LocalDateTime.now();
         this.actionType = actionType;
         this.comment = comment;
         this.parent = parent;

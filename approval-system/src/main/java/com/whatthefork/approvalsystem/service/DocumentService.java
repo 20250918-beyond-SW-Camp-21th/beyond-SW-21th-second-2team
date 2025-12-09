@@ -177,6 +177,49 @@ public class DocumentService {
        return responseDto;
     }
 
+    //     기안자, 결재자, 참조자 아니면 읽지 못 하게.
+//     그 후 ApprovalHistory에 action은 결재자, READ로 변경하고 읽은 시간도 추가하는 로그를 남기는 메소드 생성
+    //  ActionTypeEnum.READ는 새로운 로그를 추가하는 행위 (상태 변경 아님)
+//  ApprovalHistory: READ 로그 기록. (문서 열람 시간 추적)
+//  ApprovalReferrer: 참조자가 열람 시 viewedAt 필드를 현재 시간으로 업데이트.
+//  ApprovalLine: 결재자가 열람해도 LineStatus는 WAIT 상태 유지.
+    public void writeHistory(Long docId, Long memberId) {
+
+        // 문서가 존재하는지
+        ApprovalDocument approvalDocument = approvalDocumentRepository.findById(docId).orElseThrow(
+                () -> new BusinessException(ErrorCode.DOCUMENT_NOT_FOUND)
+        );
+
+        // 기안자 본인이면 로그 기록 하지 않음
+        if(approvalDocument.isSameDrafter(memberId)) {
+            return;
+        }
+
+        // 이 사람이 결재자인지
+        boolean isApprover = approvalLineRepository.existsByDocumentAndApprover(docId, memberId);
+
+        // 이 사람이 참조자인지, 참조자가 아니면 null 반환
+        ApprovalReferrer approvalReferrer = approvalReferrerRepository.findByDocumentAndReferrer(docId, memberId)
+                .orElse(null);
+
+        // 둘다 아니면 에러 처리
+        if(!isApprover && approvalReferrer == null) {
+            throw new BusinessException(ErrorCode.NO_READ_AUTHORIZATION);
+        }
+
+        // 참조자일 경우 읽은 시간 설정
+        if(approvalReferrer != null) {
+            approvalReferrer.updateViewedAt();
+        }
+
+        ApprovalHistory approvalHistory = ApprovalHistory.builder()
+                .document(docId)
+                .actor(memberId)
+                .actionType(ActionTypeEnum.READ)
+                .build();
+        approvalHistoryRepositoy.save(approvalHistory);
+    }
+
     @Transactional(readOnly = true)
     public Page<DocumentListResponseDto> getTempDocumentList(Long memberId, Pageable pageable) {
         Page<ApprovalDocument> documentList = approvalDocumentRepository.findByDocStatusAndDrafterOrderByCreatedAtDesc(DocStatusEnum.TEMP, memberId, pageable);

@@ -21,10 +21,13 @@ public enum ErrorCode {
     DRAFTER_EQUALS_APPROVER(HttpStatus.BAD_REQUEST, "D006", "본인은 결재자로 등록할 수 없습니다."),
 
     // Approval
-    CANNOT_CANCLE_SUBMIT(HttpStatus.BAD_REQUEST, "A001", "결재자가 읽은 문서는 상신을 취소할 수 없습니다."),
+    CANNOT_CANCLE_SUBMIT(HttpStatus.BAD_REQUEST, "P001", "결재자가 읽은 문서는 상신을 취소할 수 없습니다."),
+    NOT_MATCH_APPROVER(HttpStatus.BAD_REQUEST, "P002", "해당 문서의 결재자만 기안을 열람할 수 있습니다."),
+    NOT_MATCH_REFERRER(HttpStatus.BAD_REQUEST, "P003", "해당 문서의 참조자만 기안을 열람할 수 있습니다."),
 
     // Auth
-    NOT_DRAFTER(HttpStatus.FORBIDDEN, "A001", "본인의 문서만 수정/삭제할 수 있습니다.");
+    NOT_DRAFTER(HttpStatus.FORBIDDEN, "A001", "본인의 문서만 수정/삭제할 수 있습니다."),
+    NO_READ_AUTHORIZATION(HttpStatus.BAD_REQUEST, "A002", "문서 열람의 권한이 없습니다.");
 
     private final HttpStatus status;
     private final String code;
