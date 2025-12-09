@@ -47,9 +47,9 @@ public class ApprovalService {
     public void submitApproval(Long docId, Long memberId) {
         ApprovalDocument document = validateSubmitAuthority(docId, memberId);
 
-        document.updateProgress();
+        document.updateProgress(); // TEMP -> IN_PROGRESS
 
-        approvalLineRepository.updateLineStatusByDocumentAndSequence(docId, 1, LineStatusEnum.WAIT);
+        approvalLineRepository.updateLineStatusByDocumentAndSequence(docId, 1, LineStatusEnum.WAIT); // 첫번째 결재자의 상태를 WAIT으로 상태(명시적으로 한 번 다시 쓰기)
 
         ApprovalHistory approvalHistory = ApprovalHistory.builder()
                 .document(docId)
@@ -66,48 +66,33 @@ public class ApprovalService {
         ApprovalLine firstLine = approvalLineRepository.findByDocumentAndSequence(docId, 1)
                 .orElseThrow(() -> new BusinessException(ErrorCode.APPROVER_REQUIRED));
 
+        // 첫번째 결재자의 memberId 가져옴
         Long firstLineApproverId = firstLine.getApprover();
 
-        if(firstLine.getLineStatus().equals(LineStatusEnum.WAIT)) {
+        // 첫번째 라인의 상태가 WAIT일 경우(APPROVED나 REJECT면 X)
+        if(!firstLine.getLineStatus().equals(LineStatusEnum.WAIT)) {
+            throw new  BusinessException(ErrorCode.CANNOT_CANCLE_SUBMIT);
+        }
 
-            boolean isRead = approvalHistoryRepositoy.existsByDocumentAndActorAndActionType(docId, firstLineApproverId, ActionTypeEnum.READ);
+        // 첫번째 결재자가 해당 문서의 로그에 READ를 남긴 적이 있다면
+        boolean isRead = approvalHistoryRepositoy.existsByDocumentAndActorAndActionType(docId, firstLineApproverId, ActionTypeEnum.READ);
 
-            if(isRead) {
-                throw new BusinessException(ErrorCode.CANNOT_CANCLE_SUBMIT);
-            }
-
-            document.updateTemp();
-
-            approvalLineRepository.updateLineStatusByDocumentAndSequence(docId, 1, LineStatusEnum.WAIT);
-
-            ApprovalHistory approvalHistory = approvalHistoryRepositoy.findApprovalHistoryByDocumentId(docId);
-
-            approvalHistory = ApprovalHistory.builder()
-                    .document(docId)
-                    .actor(memberId)
-                    .actionType(ActionTypeEnum.CANCEL)
-                    .build();
-            approvalHistoryRepositoy.save(approvalHistory);
-
-        } else {
+        if(isRead) {
             throw new BusinessException(ErrorCode.CANNOT_CANCLE_SUBMIT);
         }
 
-//        // 히스토리에서 타입을 가져온 뒤 SUBMIT이나 CREATE이면 취소 가능
-//        ApprovalHistory approvalHistory = approvalHistoryRepositoy.findApprovalHistoryByDocumentId(docId);
-//        if(approvalHistory.getActionType().equals(ActionTypeEnum.CREATE) || approvalHistory.getActionType().equals(ActionTypeEnum.UPDATE) ||
-//                approvalHistory.getActionType().equals(ActionTypeEnum.SUBMIT)) {
-//            approvalHistory = ApprovalHistory.builder()
-//                    .document(docId)
-//                    .actor(memberId)
-//                    .actionType(ActionTypeEnum.CANCEL)
-//                    .build();
-//            approvalHistoryRepositoy.save(approvalHistory);
-//            document.updateTemp();
-//        } else {
-//            throw new BusinessException(ErrorCode.CANNOT_CANCLE_SUBMIT);
-//        }
-    }
+        // 상신 취소. IN_PROGRESS -> TEMP
+        document.updateTemp();
+
+        // 로그에 상신취소 남기기
+        ApprovalHistory approvalHistory = ApprovalHistory.builder()
+                .document(docId)
+                .actor(memberId)
+                .actionType(ActionTypeEnum.CANCEL)
+                .build();
+        approvalHistoryRepositoy.save(approvalHistory);
+
+        }
 
     public ApprovalDocument validateSubmitAuthority(Long docId, Long memberId) {
         ApprovalDocument document = approvalDocumentRepository.findById(docId).orElseThrow(
