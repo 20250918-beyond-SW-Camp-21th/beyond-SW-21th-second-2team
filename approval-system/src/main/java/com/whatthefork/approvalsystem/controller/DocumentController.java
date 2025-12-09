@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 @Tag(name = "Document", description = "결재 문서 관리 API (기안, 조회, 수정, 삭제, 각종 문서함)")
 @RestController
@@ -23,7 +24,6 @@ public class DocumentController {
 
     private final DocumentService documentService;
 
-    /* 12.06 모든 메소드의 매개변수에 userId 대신 @AuthenticationPrincipal UserDetailsImpl로 로그인된 사용자 정보에서 Id 추출할 예정. 현재는 임시 기입 */
     @Operation(summary = "결재 문서 기안 (생성)", description = "새로운 결재 문서를 작성합니다. 성공 시 문서 ID를 반환합니다.")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -36,9 +36,11 @@ public class DocumentController {
             )
     })
     @PostMapping("/drafting")
-    public ResponseEntity<ApiResponse> createDocument(/*Long userId, */@RequestBody @Valid CreateDocumentRequestDto requestDto) {
+    public ResponseEntity<ApiResponse> createDocument(
+            @AuthenticationPrincipal String userIdStr,
+            @RequestBody @Valid CreateDocumentRequestDto requestDto) {
         /* 12.07 security 완성 전까지 임시 유저 ID는 1로 고정해서 API 테스트 */
-        Long memberId = 101L;
+        Long memberId = Long.parseLong(userIdStr);
         Long docId = documentService.createDocument(memberId, requestDto);
         return ResponseEntity.ok(ApiResponse.success(docId));
     }
