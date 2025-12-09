@@ -33,7 +33,7 @@ jwt:
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
-  mapper-locations: mappers/**/*.xml
+  mapper-locations: classpath:mapper/**/*.xml
   type-aliases-package: com.whatthefork.userservice.query.dto
 
 eureka:

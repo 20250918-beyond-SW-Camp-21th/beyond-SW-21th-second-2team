@@ -33,10 +33,10 @@ public class UserQueryController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-    @GetMapping("/users/{userId}/grade")
-    public ResponseEntity<ApiResponse<String>> getUserGrade(@PathVariable("userId") Long userId) {
-        String grade = userQueryService.getUserGrade(userId);
-        return ResponseEntity.ok(ApiResponse.success(grade));
-    }
+//    @GetMapping("/users/{userId}/grade")
+//    public ResponseEntity<ApiResponse<String>> getUserGrade(@PathVariable("userId") Long userId) {
+//        String grade = userQueryService.getUserGrade(userId);
+//        return ResponseEntity.ok(ApiResponse.success(grade));
+//    }
 
 }
