@@ -92,6 +92,7 @@ public class AttendanceService {
     }
 
     //오늘 출퇴근 현황
+    @Transactional(readOnly = true)
     public Optional<AttendanceResponse> getToday(Long userId) {
 
         LocalDateTime now = LocalDateTime.now();
@@ -107,6 +108,7 @@ public class AttendanceService {
     }
 
     //이번주 출퇴근 현황
+    @Transactional(readOnly = true)
     public List<AttendanceResponse> getWeek(Long userId) {
 
         LocalDate today = LocalDate.now();
@@ -124,6 +126,7 @@ public class AttendanceService {
     }
 
     //지정 year,month의 출퇴근 현황
+    @Transactional(readOnly = true)
     public List<AttendanceResponse> getMonth(Long userId, int year, int month) {
         LocalDate firstDay = LocalDate.of(year, month, 1);
         LocalDate firstDayNextMonth = firstDay.plusMonths(1);
@@ -139,6 +142,7 @@ public class AttendanceService {
     }
 
     // 이번달 출근수, 지각, 초과근무 현황
+    @Transactional(readOnly = true)
     public Optional<AttendanceTotalResponse> getTotal(Long userId) {
         LocalDate today = LocalDate.now();
         LocalDate firstDay = LocalDate.of(today.getYear(), today.getMonth(), 1);
@@ -154,25 +158,24 @@ public class AttendanceService {
         int totalOverTimeMinutes = attendances.stream().filter(a -> a.getPunchOutDate() != null).mapToInt(Attendance::getOvertimeMinutes).sum();
 
         AttendanceTotalResponse response = AttendanceTotalResponse.builder()
-                .totalAttendanceCount("이번달 출근한 날 : " + totalAttendanceCount + "번")
-                .totalLate("지각한 날 : " + totalLateCount + "번 (" + totalLateMinutes + "분)")
-                .totalOverTimeMinutes("총 초과근무 : " + totalOverTimeMinutes + "분")
+                .totalAttendanceCount(totalAttendanceCount)
+                .countIsLate(totalLateCount)
+                .totalLateMinutes(totalLateMinutes)
+                .totalOverTimeMinutes(totalOverTimeMinutes)
                 .build();
 
         return Optional.of(response);
     }
 
-
-    public List<AttendanceResponse> getDay(Long userId, Integer year, Integer month, Integer day) {
+    @Transactional(readOnly = true)
+    public Optional<AttendanceResponse> getDay(Long userId, Integer year, Integer month, Integer day) {
 
         LocalDate userDay = LocalDate.of(year,month,day);
         LocalDateTime start = userDay.atStartOfDay();
         LocalDateTime end = userDay.plusDays(1).atStartOfDay();
 
         return attendanceRepository
-                .findAttendanceByUserId(userId,start,end)
-                .stream()
-                .map(AttendanceResponse::from)
-                .toList();
+                .findByUserIdAndPunchInDateBetweenOrderByPunchInDateAsc(userId,start,end)
+                .map(AttendanceResponse::from);
     }
 }

@@ -50,8 +50,8 @@ public class AttendanceController {
         return  ResponseEntity.ok(ApiResponse.success(responses));
     }
 
-    @GetMapping("/month")
-    public ResponseEntity<ApiResponse> getMonth(@RequestParam Long userId, @RequestParam Integer year, @RequestParam Integer month) {
+    @GetMapping("/{year}/{month}")
+    public ResponseEntity<ApiResponse> getMonth(@RequestParam Long userId, @PathVariable Integer year, @PathVariable Integer month) {
         List<AttendanceResponse> responses = attendanceService.getMonth(userId,year,month);
         return  ResponseEntity.ok(ApiResponse.success(responses));
     }
@@ -62,10 +62,10 @@ public class AttendanceController {
         return  ResponseEntity.ok(ApiResponse.success(total));
     }
 
-    @GetMapping("/day")
-    public ResponseEntity<ApiResponse> getDay(@RequestParam Long userId, @RequestParam Integer year, @RequestParam Integer month, @RequestParam Integer day) {
-        List<AttendanceResponse> responses = attendanceService.getDay(userId,year,month,day);
-        return  ResponseEntity.ok(ApiResponse.success(responses));
+    @GetMapping("/{year}/{month}/{day}")
+    public ResponseEntity<ApiResponse> getDay(@RequestParam Long userId, @PathVariable Integer year, @PathVariable Integer month, @PathVariable Integer day) {
+        Optional<AttendanceResponse> response = attendanceService.getDay(userId,year,month,day);
+        return  ResponseEntity.ok(ApiResponse.success(response));
     }
 
 
