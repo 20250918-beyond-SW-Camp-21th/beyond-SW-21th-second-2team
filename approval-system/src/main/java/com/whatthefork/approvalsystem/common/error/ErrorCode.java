@@ -20,6 +20,9 @@ public enum ErrorCode {
     INVALID_APPROVER_COUNT(HttpStatus.BAD_REQUEST, "D005", "결재자는 반드시 3명이어야 합니다."),
     DRAFTER_EQUALS_APPROVER(HttpStatus.BAD_REQUEST, "D006", "본인은 결재자로 등록할 수 없습니다."),
 
+    // Approval
+    CANNOT_CANCLE_SUBMIT(HttpStatus.BAD_REQUEST, "A001", "결재자가 읽은 문서는 상신을 취소할 수 없습니다."),
+
     // Auth
     NOT_DRAFTER(HttpStatus.FORBIDDEN, "A001", "본인의 문서만 수정/삭제할 수 있습니다.");
 

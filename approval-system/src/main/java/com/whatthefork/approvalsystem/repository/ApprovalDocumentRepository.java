@@ -12,6 +12,8 @@ import java.util.Optional;
 public interface ApprovalDocumentRepository extends JpaRepository<ApprovalDocument, Long> {
     Optional<ApprovalDocument> findById(long id);
 
+    ApprovalDocument findApprovalDocumentById(long id);
+
     Page<ApprovalDocument> findByDocStatusAndDrafterOrderByCreatedAtDesc(DocStatusEnum docStatus, Long drafter, Pageable pageable);
 
     Page<ApprovalDocument> findByDrafterAndDocStatusInOrderByCreatedAtDesc(Long drafter, List<DocStatusEnum> statusEnumList, Pageable pageable);

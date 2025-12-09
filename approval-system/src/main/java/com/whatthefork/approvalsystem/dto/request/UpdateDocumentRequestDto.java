@@ -29,4 +29,7 @@ public class UpdateDocumentRequestDto {
     @NotNull(message = "휴가 종료 일자는 필수로 지정해야 합니다.")
     private LocalDate endVacationDate;
 
+    @NotBlank(message = "수정 사유는 필수로 입력해야 합니다.")
+    private String updateComment;
+
 }

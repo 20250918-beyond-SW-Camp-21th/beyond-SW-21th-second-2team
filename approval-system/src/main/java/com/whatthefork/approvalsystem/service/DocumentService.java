@@ -108,6 +108,15 @@ public class DocumentService {
                 requestDto.getEndVacationDate()
         );
 
+        ApprovalHistory approvalHistory = ApprovalHistory.builder()
+                .document(docId)
+                .actor(memberId)
+                .actionType(ActionTypeEnum.UPDATE)
+                .comment(requestDto.getUpdateComment())
+                .build();
+
+        approvalHistoryRepositoy.save(approvalHistory);
+
         approvalLineRepository.deleteByDocumentId(docId);
         createApprovalLines(docId, approvalIds);
     }

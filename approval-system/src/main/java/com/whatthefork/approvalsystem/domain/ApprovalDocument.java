@@ -94,4 +94,12 @@ public class ApprovalDocument {
     public boolean isTempStatus() {
         return this.docStatus == DocStatusEnum.TEMP;
     }
+
+    public void updateProgress() {
+        this.docStatus = DocStatusEnum.IN_PROGRESS;
+    }
+
+    public void updateTemp() {
+        this.docStatus = DocStatusEnum.TEMP;
+    }
 }
