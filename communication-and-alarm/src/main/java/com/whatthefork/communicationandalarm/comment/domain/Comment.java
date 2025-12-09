@@ -1,5 +1,6 @@
 package com.whatthefork.communicationandalarm.comment.domain;
 
+import com.whatthefork.communicationandalarm.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,7 +12,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Comment {
+public class Comment extends BaseEntity {
 
     @Id
     @Column(name = "comment_id", nullable = false)

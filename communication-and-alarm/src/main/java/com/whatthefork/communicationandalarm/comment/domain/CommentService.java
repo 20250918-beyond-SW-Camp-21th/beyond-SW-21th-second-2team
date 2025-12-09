@@ -23,7 +23,6 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     private static final Long ROOT_DEPTH_SIZE = 0L;
-    private static final Long FIRST_DEPTH_SIZE = 1L;
     private static final Long MAX_DEPTH_SIZE = 2L;
 
     /*
