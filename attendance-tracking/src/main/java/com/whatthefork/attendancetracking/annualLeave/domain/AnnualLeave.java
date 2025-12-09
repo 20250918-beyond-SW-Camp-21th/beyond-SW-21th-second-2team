@@ -51,4 +51,5 @@ public class AnnualLeave {
         this.totalLeave = totalLeave;
         this.year = year;
     }
+    
 }
