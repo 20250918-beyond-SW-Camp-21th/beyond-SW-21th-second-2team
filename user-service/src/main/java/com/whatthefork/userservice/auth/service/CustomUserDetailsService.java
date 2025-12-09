@@ -23,9 +23,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("유저 찾지 못함"));
 
-        /* 수정 사항 : spring security의 UserDetails를 extends 하여 CustomUser 작성
-        * 고유 id 숫자, 로그인 id(email), password, authorities 를 저장하고 반환
-        * */
         return CustomUser.builder()
                 .id(user.getId())
                 .username(user.getEmail())

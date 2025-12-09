@@ -35,7 +35,7 @@ public class JwtTokenProvider {
         secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // access token 생성 메소드 (claim에 userId 추가)
+    // access token 생성 메소드
     public String createToken(String username, String role, Long userId) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpiration);

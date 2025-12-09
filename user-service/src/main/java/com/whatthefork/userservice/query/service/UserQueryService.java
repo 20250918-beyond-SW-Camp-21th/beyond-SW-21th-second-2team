@@ -31,12 +31,12 @@ public class UserQueryService {
                 .build();
     }
 
-    public String getUserGrade(Long userId) {
-        UserDTO user = userMapper.findUserById(userId);
-        if (user == null) {
-            throw new RuntimeException("유저 정보 찾지 못함");
-        }
-
-        return "PREMIUM";
-    }
+//    public String getUserGrade(Long userId) {
+//        UserDTO user = userMapper.findUserById(userId);
+//        if (user == null) {
+//            throw new RuntimeException("유저 정보 찾지 못함");
+//        }
+//
+//        return "PREMIUM";
+//    }
 }
