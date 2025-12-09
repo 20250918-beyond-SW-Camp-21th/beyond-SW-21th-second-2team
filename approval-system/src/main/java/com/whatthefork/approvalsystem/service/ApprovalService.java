@@ -119,6 +119,14 @@ public class ApprovalService {
         } else {
             document.completeApproval();
             // annualRepository.findByMember(memberId)로 불러와서, annualLeave.decreaseAnnual((int) 휴가 종료일 - 휴가 시작일)
+            /*
+            * AnnualHistory annualHistory = AnnualHistory.Builder()
+            * .userId(document.getDrafter())
+            * .startDate(document.getStartDate())
+            * .endDate(document.endDate())
+            * .approver(memberId())
+            * .build()
+            * */
         }
     }
 

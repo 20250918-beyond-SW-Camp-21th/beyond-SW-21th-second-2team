@@ -1,11 +1,12 @@
-#spring.application.name=gateway
 server:
   port: 8000
+
 spring:
   application:
     name: gateway-server
   cloud:
     gateway:
+      # [변경됨] 최신 버전에서는 server -> webflux 밑에 routes가 와야 합니다.
       server:
         webflux:
           routes:
@@ -15,30 +16,35 @@ spring:
                 - Path=/api/v1/auth-and-security/**
               filters:
                 - RewritePath=/api/v1/auth-and-security/(?<segment>.*), /$\{segment}
+
             - id: approval-system
               uri: lb://APPROVAL-SYSTEM
               predicates:
                 - Path=/api/v1/approval-system/**
               filters:
                 - RewritePath=/api/v1/approval-system/(?<segment>.*), /$\{segment}
+
             - id: attendance-tracking
               uri: lb://ATTENDANCE-TRACKING
               predicates:
                 - Path=/api/v1/attendance-tracking/**
               filters:
                 - RewritePath=/api/v1/attendance-tracking/(?<segment>.*), /$\{segment}
+
             - id: communication-and-alarm
               uri: lb://COMMUNICATION-AND-ALARM
               predicates:
                 - Path=/api/v1/communication-and-alarm/**
               filters:
                 - RewritePath=/api/v1/communication-and-alarm/(?<segment>.*), /$\{segment}
+
             - id: resource-reservation
               uri: lb://RESOURCE-RESERVATION
               predicates:
                 - Path=/api/v1/resource-reservation/**
               filters:
                 - RewritePath=/api/v1/resource-reservation/(?<segment>.*), /$\{segment}
+
             - id: user-service
               uri: lb://USER-SERVICE
               predicates:
@@ -46,8 +52,20 @@ spring:
               filters:
                 - RewritePath=/api/v1/user-service/(?<segment>.*), /$\{segment}
 
-eureka:
+      # [추가] CORS 설정 (Swagger 연동을 위해 필수)
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
 
+eureka:
   client:
     fetch-registry: true
     register-with-eureka: true
@@ -57,3 +75,24 @@ eureka:
 jwt:
   secret: +i12AQFwws/Del1pGAOB0imXQLGaCNd7dyMF41Mxe6k=
   expiration: 86400000
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+    disable-swagger-default-url: true
+    urls:
+      - name: 1. 인증/보안 (Auth)
+        url: /api/v1/auth-and-security/v3/api-docs
+      - name: 2. 결재 시스템 (Approval)
+        url: /api/v1/approval-system/v3/api-docs
+      - name: 3. 근태 관리 (Attendance)
+        url: /api/v1/attendance-tracking/v3/api-docs
+      - name: 4. 소통 및 알림 (Communication and Alarm)
+        url: /api/v1/communication-and-alarm/v3/api-docs
+      - name: 5. 자원 예약 (Reservation)
+        url: /api/v1/resource-reservation/v3/api-docs
+      - name: 6. 사용자 서비스 (User)
+        url: /api/v1/user-service/v3/api-docs
+  api-docs:
+    enabled: true
