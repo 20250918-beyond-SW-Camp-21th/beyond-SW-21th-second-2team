@@ -52,4 +52,22 @@ public class GatewayJwtTokenProvider {
         return claims.get("role", String.class);
     }
 
+    public String getNameFromJWT(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return claims.get("name", String.class);
+    }
+
+    public String getMailFromJWT(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return claims.get("email", String.class);
+    }
+
 }

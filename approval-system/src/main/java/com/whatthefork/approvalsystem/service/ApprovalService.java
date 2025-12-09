@@ -5,12 +5,14 @@ import com.whatthefork.approvalsystem.common.error.ErrorCode;
 import com.whatthefork.approvalsystem.domain.ApprovalDocument;
 import com.whatthefork.approvalsystem.domain.ApprovalHistory;
 import com.whatthefork.approvalsystem.domain.ApprovalLine;
+import com.whatthefork.approvalsystem.dto.response.DocumentListResponseDto;
 import com.whatthefork.approvalsystem.enums.ActionTypeEnum;
 import com.whatthefork.approvalsystem.enums.LineStatusEnum;
 import com.whatthefork.approvalsystem.repository.ApprovalDocumentRepository;
 import com.whatthefork.approvalsystem.repository.ApprovalHistoryRepositoy;
 import com.whatthefork.approvalsystem.repository.ApprovalLineRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -116,6 +118,15 @@ public class ApprovalService {
             document.nextSequence();
         } else {
             document.completeApproval();
+            // annualRepository.findByMember(memberId)로 불러와서, annualLeave.decreaseAnnual((int) 휴가 종료일 - 휴가 시작일)
+            /*
+            * AnnualHistory annualHistory = AnnualHistory.Builder()
+            * .userId(document.getDrafter())
+            * .startDate(document.getStartDate())
+            * .endDate(document.endDate())
+            * .approver(memberId())
+            * .build()
+            * */
         }
     }
 

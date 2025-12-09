@@ -161,20 +161,18 @@ public class DocumentService {
                         .build()
         ).toList();
 
-       DocumentDetailResponseDto responseDto = DocumentDetailResponseDto.builder()
-               .documentId(docId)
-               .title(document.getTitle())
-               .content(document.getContent())
-               .docStatus(document.getDocStatus())
-               .drafterId(document.getDrafter())
-               .startVacationDate(document.getStartVacationDate())
-               .endVacationDate(document.getEndVacationDate())
-               .createdAt(document.getCreatedAt())
-               .approvers(approvalLinesResponseDto)
-               .referrers(referrerResponseDto)
-               .build();
-
-       return responseDto;
+        return DocumentDetailResponseDto.builder()
+                .documentId(docId)
+                .title(document.getTitle())
+                .content(document.getContent())
+                .docStatus(document.getDocStatus())
+                .drafterId(document.getDrafter())
+                .startVacationDate(document.getStartVacationDate())
+                .endVacationDate(document.getEndVacationDate())
+                .createdAt(document.getCreatedAt())
+                .approvers(approvalLinesResponseDto)
+                .referrers(referrerResponseDto)
+                .build();
     }
 
     //     기안자, 결재자, 참조자 아니면 읽지 못 하게.
@@ -241,6 +239,44 @@ public class DocumentService {
         Page<ApprovalDocument> documentList = approvalDocumentRepository.findByDrafterAndDocStatusInOrderByCreatedAtDesc(memberId, statuses, pageable);
 
         return getResponseDto(documentList);
+    }
+
+    /* 결재 대기함 (자신이 결재해야 될 문서 목록) */
+    @Transactional(readOnly = true)
+    public Page<DocumentListResponseDto> getDocumentsToApprove(Long memberId, Pageable pageable) {
+
+        // 우선 전체 문서중, 멤버ID가 포함되고 그 포함된 결재선의 시퀀스와 문서의 시퀀스가 같은 것들의 문서를 불러와야함
+        // 그럼 그 문서를 ResponseDTO에 담아서 return
+        // 접근 권한 넣기
+        Page<ApprovalDocument> documentList = approvalDocumentRepository.findDocumentsToApprove(memberId, pageable);
+        return getResponseDto(documentList);
+    }
+
+    /* 기결재함(자신이 승인/반려 처리 한 문서 목록) */
+    @Transactional(readOnly = true)
+    public Page<DocumentListResponseDto> getProcessedDocuments(Long memberId, Pageable pageable) {
+
+        /*
+        * 1. History의 기안 id = Document의 기안 id
+        * 2. History의 actor = memberId
+        * 3. History에 타입이 APPROVE 혹은 REJECT 인것
+        * 4. Document에 TEMP만 아니면 됨
+        * */
+        Page<ApprovalDocument> documentList = approvalDocumentRepository.findProcessedDocuments(memberId, pageable);
+        return getResponseDto(documentList);
+    }
+
+    /* 참조 문서함(참조자로 지정된 문서 목록) */
+    @Transactional(readOnly = true)
+    public Page<DocumentListResponseDto> getReferencedDocuments(Long  memberId, Pageable pageable) {
+        /*
+        * 1. Referrer의 기안 id = Document의 기안 id
+        * 2. Refferer의 referrer = memberId
+        * 3.
+        * */
+        Page<ApprovalDocument> documentList = approvalDocumentRepository.findReferencedDocuments(memberId, pageable);
+        return getResponseDto(documentList);
+
     }
 
     private Page<DocumentListResponseDto> getResponseDto(Page<ApprovalDocument> documentList) {

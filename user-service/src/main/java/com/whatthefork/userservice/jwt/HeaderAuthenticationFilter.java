@@ -21,6 +21,16 @@ public class HeaderAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        String uri = request.getRequestURI();
+
+        // swagger 필터 스킵
+        if (uri.startsWith("/v3/api-docs")
+                || uri.startsWith("/swagger-ui")
+                || uri.startsWith("/swagger-resources")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String userId = request.getHeader("X-User-Id");
         String role = request.getHeader("X-User-Role");
 

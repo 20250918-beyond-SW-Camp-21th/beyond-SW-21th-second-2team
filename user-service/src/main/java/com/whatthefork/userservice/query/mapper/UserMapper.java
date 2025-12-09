@@ -11,4 +11,6 @@ public interface UserMapper {
     List<UserDTO> findAllUsers();
 
     UserDTO findUserById(Long userId);
+
+    UserDTO findUserByEmail(String email);
 }
