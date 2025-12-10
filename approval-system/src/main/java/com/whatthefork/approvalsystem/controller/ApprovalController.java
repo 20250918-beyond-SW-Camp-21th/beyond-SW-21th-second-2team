@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Approval", description = "결재 처리 API (상신, 승인, 반려, 취소)")
@@ -29,9 +30,10 @@ public class ApprovalController {
             )
     })
     @PutMapping("/{docId}/submit")
-    public ResponseEntity<ApiResponse> submitApproval(/*Long memberId,*/ @PathVariable Long docId) {
-        Long memberId = 101L;
-        approvalService.submitApproval(docId, memberId);
+    public ResponseEntity<ApiResponse> submitApproval(
+            @AuthenticationPrincipal String memberId,
+            @PathVariable Long docId) {
+        approvalService.submitApproval(docId, Long.valueOf(memberId));
         return ResponseEntity.ok(ApiResponse.success("상신 완료"));
     }
 
@@ -51,9 +53,10 @@ public class ApprovalController {
             )
     })
     @PutMapping("/{docId}/submit/cancel")
-    public ResponseEntity<ApiResponse> cancelApproval(/*Long memberId,*/ @PathVariable Long docId) {
-        Long memberId = 101L;
-        approvalService.cancelSubmit(docId, memberId);
+    public ResponseEntity<ApiResponse> cancelApproval(
+            @AuthenticationPrincipal String memberId,
+            @PathVariable Long docId) {
+        approvalService.cancelSubmit(docId, Long.valueOf(memberId));
         return ResponseEntity.ok(ApiResponse.success("상신 취소 완료"));
     }
 
@@ -69,9 +72,10 @@ public class ApprovalController {
             )
     })
     @PutMapping("/{docId}/approve")
-    public ResponseEntity<ApiResponse> approveDocument(/*Long memberId,*/ @PathVariable Long docId) {
-        Long memberId = 101L;
-        approvalService.approveDocument(docId, memberId);
+    public ResponseEntity<ApiResponse> approveDocument(
+            @AuthenticationPrincipal String memberId,
+            @PathVariable Long docId) {
+        approvalService.approveDocument(docId, Long.valueOf(memberId));
         return ResponseEntity.ok(ApiResponse.success("결재 승인"));
     }
 
@@ -87,9 +91,10 @@ public class ApprovalController {
             )
     })
     @PutMapping("/{docId}/reject")
-    public ResponseEntity<ApiResponse> rejectDocument(/*Long memberId,*/ @PathVariable Long docId) {
-        Long memberId = 101L;
-        approvalService.rejectDocument(docId, memberId);
+    public ResponseEntity<ApiResponse> rejectDocument(
+            @AuthenticationPrincipal String memberId,
+            @PathVariable Long docId) {
+        approvalService.rejectDocument(docId, Long.valueOf(memberId));
         return ResponseEntity.ok(ApiResponse.success("결재 반려 완료"));
     }
 }
