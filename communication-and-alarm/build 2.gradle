@@ -4,13 +4,19 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
-group = 'com.whatthefork'
+group = 'com.ohgiraffers'
 version = '0.0.1-SNAPSHOT'
-description = 'resource-reservation'
+description = 'communication-and-alarm'
 
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
     }
 }
 
@@ -23,22 +29,19 @@ ext {
 }
 
 dependencies {
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-    implementation 'org.springframework.boot:spring-boot-starter'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    testImplementation 'org.springframework.security:spring-security-test'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.12'
     annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     runtimeOnly 'com.mysql:mysql-connector-j'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.5.6")
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
 }
 
 dependencyManagement {
@@ -49,8 +52,4 @@ dependencyManagement {
 
 tasks.named('test') {
     useJUnitPlatform()
-}
-
-springBoot {
-    mainClass = 'com.whatthefork.resourcereservation.ResourceReservationApplication'
 }

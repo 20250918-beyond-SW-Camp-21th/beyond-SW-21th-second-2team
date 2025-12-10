@@ -1,5 +1,6 @@
 package com.whatthefork.resourcereservation.resource.config;
 
+import com.whatthefork.resourcereservation.resource.config.handler.CustomAccessDeniedHandler;
 import com.whatthefork.resourcereservation.resource.filter.GatewayAuthFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,13 +11,21 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.stereotype.Component;
 
 @Configuration
+@Component
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true) // @PreAuthorize 활성화
 public class SecurityConfig {
 
-    // 1. 커스텀 필터를 빈으로 등록 (빈 등록은 필요 없을 수도 있음. SecurityFilterChain 내부에서 인스턴스화 가능)
+    private final GatewayAuthFilter gatewayAuthFilter;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+
+    public SecurityConfig(GatewayAuthFilter gatewayAuthFilter, CustomAccessDeniedHandler customAccessDeniedHandler) {
+        this.gatewayAuthFilter = gatewayAuthFilter;
+        this.customAccessDeniedHandler = customAccessDeniedHandler;
+    }
 
     // 2. 필터 체인 설정
     @Bean
@@ -25,7 +34,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // CSRF 보호 비활성화 (API 서버이므로)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 미사용
                         .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/conference-room/**", "/corporate-cars/**", "/supplies/**", "/reservations/**").permitAll()
+                        .requestMatchers("/conference-rooms/**", "/corporate-cars/**", "/supplies/**", "/reservations/**").permitAll()
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
@@ -33,10 +42,13 @@ public class SecurityConfig {
                         ).permitAll()
                         .anyRequest().authenticated()
                         )
-                .addFilterBefore(new GatewayAuthFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(gatewayAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(handling -> {
+                    handling.accessDeniedHandler(customAccessDeniedHandler);
+                });
 
         // 3. 커스텀 필터를 UsernamePasswordAuthenticationFilter 이전에 추가
-        http.addFilterBefore(new com.whatthefork.resourcereservation.resource.filter.GatewayAuthFilter(), UsernamePasswordAuthenticationFilter.class);
+//        http.addFilterBefore(new com.whatthefork.resourcereservation.resource.filter.GatewayAuthFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

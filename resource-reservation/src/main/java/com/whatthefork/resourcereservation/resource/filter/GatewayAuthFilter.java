@@ -12,6 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Log4j2
+@Component
 public class GatewayAuthFilter extends OncePerRequestFilter {
 
     @Override
@@ -39,7 +41,7 @@ public class GatewayAuthFilter extends OncePerRequestFilter {
         }
 
         final String userId = request.getHeader("X-User-ID");
-        final String userRoles = "ROLE_" + request.getHeader("X-User-Role");
+        final String userRoles = request.getHeader("X-User-Role");
 
         log.info("User {} has roles {}", userId, userRoles);
 
@@ -47,6 +49,7 @@ public class GatewayAuthFilter extends OncePerRequestFilter {
 
             List<GrantedAuthority> authorities = Arrays.stream(userRoles.split(","))
                     .map(String::trim)
+                    .map(role -> "ROLE_" + role.toUpperCase())
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
 

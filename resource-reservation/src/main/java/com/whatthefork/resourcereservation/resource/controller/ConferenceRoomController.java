@@ -25,7 +25,7 @@ import java.util.List;
 @Tag(name = "ConferenceRoom", description = "회의실 API (추가, 수정, 삭제, 조회")
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/conference-rooms")
+@RequestMapping("/conference-rooms")
 @RequiredArgsConstructor
 public class ConferenceRoomController {
 

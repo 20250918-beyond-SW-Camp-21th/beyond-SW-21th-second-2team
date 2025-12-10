@@ -25,7 +25,7 @@ import java.util.List;
 @Tag(name = "Supplies", description = "비품 API (추가, 수정, 삭제, 조회")
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/supplies")
+@RequestMapping("/supplies")
 @RequiredArgsConstructor
 public class SuppliesController {
 

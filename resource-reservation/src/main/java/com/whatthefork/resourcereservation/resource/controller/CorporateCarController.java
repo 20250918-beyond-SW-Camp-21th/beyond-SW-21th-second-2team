@@ -25,7 +25,7 @@ import java.util.List;
 @Tag(name = "Corporate Car", description = "법인차량 API (추가, 수정, 삭제, 조회")
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/corporate-cars")
+@RequestMapping("/corporate-cars")
 @RequiredArgsConstructor
 public class CorporateCarController {
 
