@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:attendance-tracking/src/main/java/com/whatthefork/attendancetracking/common/config/SwaggerConfig.java
-package com.whatthefork.attendancetracking.common.config;
-========
 package com.whatthefork.attendancetracking.config;
->>>>>>>> dev:attendance-tracking/src/main/java/com/whatthefork/attendancetracking/config/SwaggerConfig.java
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
