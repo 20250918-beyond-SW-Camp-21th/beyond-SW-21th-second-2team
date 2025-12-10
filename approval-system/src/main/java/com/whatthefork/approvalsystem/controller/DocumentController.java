@@ -12,7 +12,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -37,11 +40,9 @@ public class DocumentController {
     })
     @PostMapping("/drafting")
     public ResponseEntity<ApiResponse> createDocument(
-            @AuthenticationPrincipal String userIdStr,
+            @AuthenticationPrincipal String memberId,
             @RequestBody @Valid CreateDocumentRequestDto requestDto) {
-        /* 12.07 security 완성 전까지 임시 유저 ID는 1로 고정해서 API 테스트 */
-        Long memberId = Long.parseLong(userIdStr);
-        Long docId = documentService.createDocument(memberId, requestDto);
+        Long docId = documentService.createDocument(Long.valueOf(memberId), requestDto);
         return ResponseEntity.ok(ApiResponse.success(docId));
     }
 
@@ -61,9 +62,11 @@ public class DocumentController {
             )
     })
     @PutMapping("/{docId}")
-    public ResponseEntity<ApiResponse> updateDocument(/*Long memberId*/ @PathVariable Long docId, @RequestBody @Valid UpdateDocumentRequestDto requestDto) {
-        Long memberId = 101L;
-        documentService.updateDocument(memberId, docId, requestDto);
+    public ResponseEntity<ApiResponse> updateDocument(
+            @AuthenticationPrincipal String memberId,
+            @PathVariable Long docId,
+            @RequestBody @Valid UpdateDocumentRequestDto requestDto) {
+        documentService.updateDocument(Long.valueOf(memberId), docId, requestDto);
         return ResponseEntity.ok(ApiResponse.success("기안 수정 완료"));
     }
 
@@ -83,9 +86,10 @@ public class DocumentController {
             )
     })
     @DeleteMapping("/{docId}")
-    public ResponseEntity<ApiResponse> deleteDocument(/*Long memberId,*/ @PathVariable Long docId) {
-        Long memberId = 101L;
-        documentService.deleteDocument(memberId, docId);
+    public ResponseEntity<ApiResponse> deleteDocument(
+            @AuthenticationPrincipal String memberId,
+            @PathVariable Long docId) {
+        documentService.deleteDocument(Long.valueOf(memberId), docId);
         return ResponseEntity.ok(ApiResponse.success("기안 삭제 완료"));
     }
 
@@ -105,58 +109,112 @@ public class DocumentController {
             )
     })
     @GetMapping("/{docId}")
-    public ResponseEntity<ApiResponse> getDocumentDetail(/*Long memberId,*/ @PathVariable Long docId) {
-        Long memberId = 101L;
-        documentService.writeReadHistory(memberId, docId);
-        DocumentDetailResponseDto response = documentService.readDetailDocument(memberId, docId);
+    public ResponseEntity<ApiResponse> getDocumentDetail(
+            @AuthenticationPrincipal String memberId,
+            @PathVariable Long docId) {
+        documentService.writeReadHistory(docId, Long.valueOf(memberId));
+        DocumentDetailResponseDto response = documentService.readDetailDocument(Long.valueOf(memberId), docId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @Operation(summary = "임시저장 문서함", description = "내가 작성 중인(임시저장) 문서를 조회합니다.")
     @GetMapping("/drafts")
-    public ResponseEntity<ApiResponse> getTempDocumentList(/*Long memberId,*/ Pageable pageable) {
-        Long memberId = 101L;
-        Page<DocumentListResponseDto> documentList = documentService.getTempDocumentList(memberId, pageable);
+    public ResponseEntity<ApiResponse> getTempDocumentList(
+            @AuthenticationPrincipal String memberId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+
+        Page<DocumentListResponseDto> documentList = documentService.getTempDocumentList(Long.valueOf(memberId), pageable);
         return ResponseEntity.ok(ApiResponse.success(documentList));
     }
 
     @Operation(summary = "결재 진행함 (상신)", description = "내가 기안하여 현재 결재가 진행 중인 문서를 조회합니다.")
     @GetMapping("/progress")
-    public ResponseEntity<ApiResponse> getProgressDocumentList(/*Long memberId,*/ Pageable pageable) {
-        Long memberId = 101L;
-        Page<DocumentListResponseDto> documentList = documentService.getProgressDocumentList(memberId, pageable);
+    public ResponseEntity<ApiResponse> getProgressDocumentList(
+            @AuthenticationPrincipal String memberId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+
+        Page<DocumentListResponseDto> documentList = documentService.getProgressDocumentList(Long.valueOf(memberId), pageable);
         return ResponseEntity.ok(ApiResponse.success(documentList));
     }
 
     @Operation(summary = "결재 완료함 (종결)", description = "내가 기안하여 승인 완료되거나 반려된 문서를 조회합니다.")
     @GetMapping("/closed")
-    public ResponseEntity<ApiResponse> getClosedDocumentList(/*Long memberId,*/ Pageable pageable) {
-        Long memberId = 101L;
-        Page<DocumentListResponseDto> documentList = documentService.getClosedDocumentList(memberId, pageable);
+    public ResponseEntity<ApiResponse> getClosedDocumentList(
+            @AuthenticationPrincipal String memberId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+        Page<DocumentListResponseDto> documentList = documentService.getClosedDocumentList(Long.valueOf(memberId), pageable);
         return ResponseEntity.ok(ApiResponse.success(documentList));
     }
 
     @Operation(summary = "결재 대기함 (미결)", description = "내가 결재해야 할 차례인 문서를 조회합니다.")
     @GetMapping("/pending")
-    public ResponseEntity<ApiResponse> getDocumentsToApprove(/*Long memberId*/ Pageable pageable) {
-        Long memberId = 101L;
-        Page<DocumentListResponseDto> documentList = documentService.getDocumentsToApprove(memberId, pageable);
+    public ResponseEntity<ApiResponse> getDocumentsToApprove(
+            @AuthenticationPrincipal String memberId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+
+        Page<DocumentListResponseDto> documentList =
+                documentService.getDocumentsToApprove(Long.valueOf(memberId), pageable);
+
         return ResponseEntity.ok(ApiResponse.success(documentList));
     }
 
     @Operation(summary = "기결재함 (처리완료)", description = "내가 승인하거나 반려 처리한 문서를 조회합니다.")
     @GetMapping("/processed")
-    public ResponseEntity<ApiResponse> getProcessedDocuments(/*Long memberId*/ Pageable pageable) {
-        Long memberId = 101L;
-        Page<DocumentListResponseDto> documentList = documentService.getProcessedDocuments(memberId, pageable);
+    public ResponseEntity<ApiResponse> getProcessedDocuments(
+            @AuthenticationPrincipal String memberId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+        Page<DocumentListResponseDto> documentList = documentService.getProcessedDocuments(Long.valueOf(memberId), pageable);
         return ResponseEntity.ok(ApiResponse.success(documentList));
     }
 
     @Operation(summary = "참조 문서함", description = "내가 참조자로 지정된 문서를 조회합니다.")
     @GetMapping("/referenced")
-    public ResponseEntity<ApiResponse> getReferencedDocuments(/*Long memberId*/ Pageable pageable) {
-        Long memberId = 101L;
-        Page<DocumentListResponseDto> documentList = documentService.getReferencedDocuments(memberId, pageable);
+    public ResponseEntity<ApiResponse> getReferencedDocuments(
+            @AuthenticationPrincipal String memberId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+
+        Page<DocumentListResponseDto> documentList = documentService.getReferencedDocuments(Long.valueOf(memberId), pageable);
         return ResponseEntity.ok(ApiResponse.success(documentList));
     }
 }

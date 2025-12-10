@@ -32,6 +32,7 @@ public class ConferenceRoomController {
     private final ConferenceRoomService conferenceRoomService;
 
     @Operation(summary = "회의실 전체 조회", description = "존재하는 회의실 전체 조회")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<ApiResponse> conferenceRoom() {
 
@@ -72,6 +73,7 @@ public class ConferenceRoomController {
     }
 
     @Operation(summary = "회의실 이름 검색", description = "이름으로 회의실 검색")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/name/{name}")
     public ResponseEntity<ApiResponse> getConferenceRoomById(@PathVariable String name) {
         log.info("get conference room by name: {}", name);
@@ -80,6 +82,7 @@ public class ConferenceRoomController {
     }
 
     @Operation(summary = "회의실 최대인원 검색", description = "회의실 최대 인원으로 검색")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/maxCapacity/{maxCapacity}")
     public ResponseEntity<ApiResponse> getConferenceRoomByMaxCapacity(@PathVariable int maxCapacity) {
         log.info("get conference room by maxCapacity: {}", maxCapacity);

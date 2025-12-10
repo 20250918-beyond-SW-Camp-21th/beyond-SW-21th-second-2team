@@ -5,6 +5,7 @@ import com.whatthefork.attendancetracking.annualLeave.domain.AnnualLeave;
 import com.whatthefork.attendancetracking.annualLeave.domain.AnnualLeaveHistory;
 import com.whatthefork.attendancetracking.annualLeave.dto.AnnualLeaveHistoryResponse;
 import com.whatthefork.attendancetracking.annualLeave.dto.AnnualLeaveResponse;
+import com.whatthefork.attendancetracking.annualLeave.dto.LeaveAnnualRequestDto;
 import com.whatthefork.attendancetracking.annualLeave.repository.AnnualLeaveHistoryRepository;
 import com.whatthefork.attendancetracking.annualLeave.repository.AnnualLeaveRepository;
 import com.whatthefork.attendancetracking.common.error.BusinessException;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,8 +31,7 @@ public class AnnualLeaveService {
     @Transactional
     public Optional<AnnualLeaveResponse> getAnnualLeave(Long memberId, Integer year) {
 
-        AnnualLeave annualLeave = annualLeaveRepository.findByMemberIdAndYear(memberId, year)
-                .orElseThrow(() -> new BusinessException(ErrorCode.ANNUAL_LEAVE_NOT_FOUND));
+        AnnualLeave annualLeave = annualLeaveRepository.findByMemberIdAndYear(memberId, year);
 
         LocalDate start = LocalDate.of(year, 1, 1);
         LocalDate end = LocalDate.of(year, 12, 31);
@@ -78,5 +79,19 @@ public class AnnualLeaveService {
                         .build()
                 )
                 .toList();
+    }
+
+    public AnnualLeaveHistoryResponse decreaseAnnual(LeaveAnnualRequestDto requestDto) {
+
+        AnnualLeave annualLeave = annualLeaveRepository.findByMemberIdAndYear(requestDto.getMemberId(), requestDto.getStartDate().getYear());
+
+        annualLeave.decreaseAnnual(requestDto.getStartDate(), requestDto.getEndDate());
+
+        return AnnualLeaveHistoryResponse.builder()
+                .memberId(requestDto.getMemberId())
+                .startDate(requestDto.getStartDate())
+                .endDate(requestDto.getEndDate())
+                .approverId(requestDto.getApproverId())
+                .build();
     }
 }

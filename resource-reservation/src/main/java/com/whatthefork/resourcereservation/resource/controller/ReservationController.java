@@ -50,6 +50,7 @@ public class ReservationController {
 
     // 예약 목록 확인
     @Operation(summary = "예약 전체 조회", description = "존재하는 예약 전체 조회")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<ApiResponse> getAllReservations() {
 
@@ -58,6 +59,7 @@ public class ReservationController {
 
     // 예약 생성
     @Operation(summary = "예약 생성", description = "회의실, 법인차량, 비품 중 한 카테고리의 예약 생성")
+    @PreAuthorize("isAuthenticated()")
     @PostMapping
     public ResponseEntity<ApiResponse> createReservation(@RequestBody CreateReservationRequest reservationRequest) {
 
@@ -95,8 +97,8 @@ public class ReservationController {
 
     // 내 만료 예약 목록 확인
     @Operation(summary = "만료 예약 조회", description = "사용자의 예약 중 만료된 항목을 조회")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/expired")
-    @PreAuthorize("hasRole('ADMIN') || reservationSecurity.isReservationOwner(principal.username, #id)")
     public ResponseEntity<ApiResponse> expiredReservations() {
 
         String userName = getUserId();
@@ -107,8 +109,8 @@ public class ReservationController {
 
     // 내 취소 예약 목록 확인
     @Operation(summary = "취소 예약 목록 확인", description = "사용자의 예약 중 취소된 항목을 조회")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/canceled")
-    @PreAuthorize("hasRole('ADMIN') || reservationSecurity.isReservationOwner(principal.username, #id)")
     public ResponseEntity<ApiResponse> canceledReservations() {
 
         String userName = getUserId();

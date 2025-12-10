@@ -33,6 +33,7 @@ public class CorporateCarController {
 
     // 법인차량 전체 목록 조회
     @Operation(summary = "법인차량 전체 조회", description = "존재하는 법인차량 전체 조회")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<ApiResponse> getCorporateCars() {
 
@@ -77,6 +78,7 @@ public class CorporateCarController {
 
     // 법인차량 이름으로 조회
     @Operation(summary = "법인차량 이름 검색", description = "이름으로 법인차량 검색")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/name/{name}")
     public ResponseEntity<ApiResponse> getCorporateCarByName(@PathVariable String name) {
         log.info("get corporate car by name : {}", name);
@@ -86,6 +88,7 @@ public class CorporateCarController {
 
     // 법인차량 최대 인원으로 조회
     @Operation(summary = "법인차량 최대인원 검색", description = "법인차량 최대 인원으로 검색")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/maxCapacity/{maxCapacity}")
     public ResponseEntity<ApiResponse> getCorporateCarByMaxCapacity(@PathVariable int maxCapacity) {
         log.info("get corporate car by maxCapacity : {}", maxCapacity);

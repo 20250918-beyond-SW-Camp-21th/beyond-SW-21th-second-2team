@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,7 +27,6 @@ public class ApprovalReferrer {
     private Long document;
 
     // 참조자(결재 권한 없음, 읽을 수만 있으며 결재선 상태에 영향 X), Member 객체 간접 참조
-    @Max(value = 5)
     @Column(name = "referrer_id", nullable = false)
     private Long referrer;
 

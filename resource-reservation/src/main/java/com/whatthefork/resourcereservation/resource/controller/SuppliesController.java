@@ -33,6 +33,7 @@ public class SuppliesController {
 
     // 전체 비품 조회
     @Operation(summary = "비품 전체 조회", description = "존재하는 비품 전체 조회")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<ApiResponse> getSupplies() {
 
@@ -77,6 +78,7 @@ public class SuppliesController {
 
     // 비품 이름 검색
     @Operation(summary = "비품 이름 검색", description = "이름으로 비품 검색")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/name/{name}")
     public ResponseEntity<ApiResponse> getSupplyById(@PathVariable String name) {
         log.info("get supply by name: {}", name);

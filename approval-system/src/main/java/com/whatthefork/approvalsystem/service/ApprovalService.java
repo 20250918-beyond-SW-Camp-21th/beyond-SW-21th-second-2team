@@ -5,14 +5,14 @@ import com.whatthefork.approvalsystem.common.error.ErrorCode;
 import com.whatthefork.approvalsystem.domain.ApprovalDocument;
 import com.whatthefork.approvalsystem.domain.ApprovalHistory;
 import com.whatthefork.approvalsystem.domain.ApprovalLine;
-import com.whatthefork.approvalsystem.dto.response.DocumentListResponseDto;
 import com.whatthefork.approvalsystem.enums.ActionTypeEnum;
 import com.whatthefork.approvalsystem.enums.LineStatusEnum;
+import com.whatthefork.approvalsystem.feign.client.AnnualLeaveFeignClient;
+import com.whatthefork.approvalsystem.feign.dto.LeaveAnnualRequestDto;
 import com.whatthefork.approvalsystem.repository.ApprovalDocumentRepository;
 import com.whatthefork.approvalsystem.repository.ApprovalHistoryRepositoy;
 import com.whatthefork.approvalsystem.repository.ApprovalLineRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +23,7 @@ public class ApprovalService {
     private final ApprovalDocumentRepository approvalDocumentRepository;
     private final ApprovalHistoryRepositoy approvalHistoryRepositoy;
     private final ApprovalLineRepository approvalLineRepository;
+    private final AnnualLeaveFeignClient annualLeaveFeignClient;
 
 /* 상신 (기안자)
  권한: 기안자만 가능하며, DocStatus가 TEMP일 때만 허용
@@ -83,15 +84,7 @@ public class ApprovalService {
 
     @Transactional
     public void approveDocument(Long docId, Long memberId) {
-        /*
-        * 1. document에서 현재 시퀀스를 가져와 line의 sequence로 currentsequence에 해당하는 멤버를 불러온다. (lineRepository 활용)
-        * 2. 현재 결재자의 LineStatus를 APPROVED로 변경하고 ApprovalHistory에 기록한다.
-        * 2.1. 마지막 결재자가 아니면 currentSequence를 1 증가 시키고, 다음 결재자의 LineStatus를 Wait으로 설정한다. (근데 createDocument에서 기본값이 다 wait이긴 한데)
-        * 2.2. 최종 결재자일 경우 ApprovalDocument의 상태를 APPROVED로 변경한다.
-        *
-        * */
 
-        // docId로 Document의 현재 sequence를 뽑아 내야함
         ApprovalDocument document = approvalDocumentRepository.findById(docId).orElseThrow(
                 () -> new BusinessException(ErrorCode.DOCUMENT_NOT_FOUND)
         );
@@ -118,15 +111,18 @@ public class ApprovalService {
             document.nextSequence();
         } else {
             document.completeApproval();
-            // annualRepository.findByMember(memberId)로 불러와서, annualLeave.decreaseAnnual((int) 휴가 종료일 - 휴가 시작일)
-            /*
-            * AnnualHistory annualHistory = AnnualHistory.Builder()
-            * .userId(document.getDrafter())
-            * .startDate(document.getStartDate())
-            * .endDate(document.endDate())
-            * .approver(memberId())
-            * .build()
-            * */
+            try {
+                LeaveAnnualRequestDto requestDto = LeaveAnnualRequestDto.builder()
+                        .memberId(document.getDrafter())
+                        .startDate(document.getStartVacationDate())
+                        .endDate(document.getEndVacationDate())
+                        .approverId(memberId)
+                        .build();
+
+                annualLeaveFeignClient.decreaseAnnualLeave(requestDto);
+            } catch (Exception e) {
+                throw new BusinessException(ErrorCode.ANNUAL_LEAVE_FAILURE);
+            }
         }
     }
 
