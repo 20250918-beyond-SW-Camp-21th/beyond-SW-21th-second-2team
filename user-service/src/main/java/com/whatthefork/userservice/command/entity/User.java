@@ -63,4 +63,9 @@ public class User {
         this.isAdmin = isAdmin;
         this.role = isAdmin ? UserRole.ADMIN : UserRole.USER;
     }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
 }

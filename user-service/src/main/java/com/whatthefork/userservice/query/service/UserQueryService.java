@@ -1,5 +1,6 @@
 package com.whatthefork.userservice.query.service;
 
+import com.whatthefork.userservice.exception.UserNotFoundException;
 import com.whatthefork.userservice.query.dto.UserDTO;
 import com.whatthefork.userservice.query.dto.UserDetailResponse;
 import com.whatthefork.userservice.query.dto.UserListResponse;
@@ -19,7 +20,15 @@ public class UserQueryService {
     public UserDetailResponse getUserDetail(Long userId) {
         UserDTO user = Optional.ofNullable(
                 userMapper.findUserById(userId)
-        ).orElseThrow(() -> new RuntimeException("유저 정보 찾지 못함"));
+        ).orElseThrow(() -> new UserNotFoundException("유저 정보를 찾을 수 없습니다: ID = " + userId));
+
+        return UserDetailResponse.builder().user(user).build();
+    }
+
+    public UserDetailResponse getUserById(Long userId) {
+        UserDTO user = Optional.ofNullable(
+                userMapper.findUserById(userId)
+        ).orElseThrow(() -> new UserNotFoundException("유저 정보를 찾을 수 없습니다: ID = " + userId));
 
         return UserDetailResponse.builder().user(user).build();
     }

@@ -33,6 +33,13 @@ public class UserQueryController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/admin/users/{userId}")
+    public ResponseEntity<ApiResponse<UserDetailResponse>> getUserById(@PathVariable Long userId) {
+        UserDetailResponse response = userQueryService.getUserById(userId);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
 //    @GetMapping("/users/{userId}/grade")
 //    public ResponseEntity<ApiResponse<String>> getUserGrade(@PathVariable("userId") Long userId) {
 //        String grade = userQueryService.getUserGrade(userId);
