@@ -29,7 +29,8 @@ public class GatewayJwtTokenProvider {
             Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
             return true;
         } catch (Exception e) {
-            throw new RuntimeException("Invalid JWT Token", e);
+            return false;
+            //throw new RuntimeException("Invalid JWT Token", e);
         }
     }
 
@@ -49,6 +50,24 @@ public class GatewayJwtTokenProvider {
                 .parseSignedClaims(token)
                 .getPayload();
         return claims.get("role", String.class);
+    }
+
+    public String getNameFromJWT(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return claims.get("name", String.class);
+    }
+
+    public String getMailFromJWT(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return claims.get("email", String.class);
     }
 
 }
