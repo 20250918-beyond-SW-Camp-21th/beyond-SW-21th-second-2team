@@ -39,6 +39,9 @@ public class Attendance {
     @Column(name = "is_late", nullable = false)
     private boolean isLate;
 
+    @Column(name = "late_minutes", nullable = false)
+    private Integer lateMinutes;
+
     //초과근무
     @Column(name = "overtime_minutes", nullable = false)
     private Integer overtimeMinutes;
@@ -52,11 +55,12 @@ public class Attendance {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Attendance(Long userId, LocalDateTime punchInDate, LocalDateTime punchOutDate, boolean isLate, Integer overtimeMinutes) {
+    public Attendance(Long userId, LocalDateTime punchInDate, LocalDateTime punchOutDate, boolean isLate, Integer lateMinutes,Integer overtimeMinutes) {
         this.userId = userId;
         this.punchInDate = punchInDate;
         this.punchOutDate = punchOutDate;
         this.isLate = isLate;
+        this.lateMinutes = lateMinutes;
         this.overtimeMinutes = overtimeMinutes;
     }
 
