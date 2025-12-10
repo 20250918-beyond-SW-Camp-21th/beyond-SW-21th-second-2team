@@ -10,7 +10,10 @@ public enum ErrorCode {
     RESOURCE_NOT_FOUND("10001", "해당 자원 찾을 수 없음", HttpStatus.NOT_FOUND),
 
     // 중복 예약
-    REDUNDANT_RESERVATION("10002", "해당 자원은 이미 예약되어 있음", HttpStatus.CONFLICT);
+    REDUNDANT_RESERVATION("10002", "해당 자원은 이미 예약되어 있음", HttpStatus.CONFLICT),
+
+    // 권한 부족
+    NOT_ENOUGH_AUTHORITY("10003", "권한 부족", HttpStatus.UNAUTHORIZED);
 
     ErrorCode(String code, String message, HttpStatus httpStatus) {
         this.code = code;
