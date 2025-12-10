@@ -1,4 +1,4 @@
-package com.whatthefork.attendancetracking;
+package com.whatthefork.attendancetracking.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

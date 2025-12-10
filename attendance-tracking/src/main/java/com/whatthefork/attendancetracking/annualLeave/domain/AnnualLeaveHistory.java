@@ -13,6 +13,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 
 @Getter
@@ -25,11 +26,11 @@ public class AnnualLeaveHistory {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Column(name = "member_id", nullable = false)
+    private Long memberId;
 
     @Column(name = "used_leave", nullable = false)
-    private Double usedLeave = 0.0;
+    private Integer usedLeave = 0;
 
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
@@ -49,11 +50,13 @@ public class AnnualLeaveHistory {
     private LocalDateTime updatedAt;
 
     @Builder
-    public AnnualLeaveHistory(Long userId, Double usedLeave, LocalDate startDate, LocalDate endDate, Long approverId) {
-        this.userId = userId;
-        this.usedLeave = usedLeave != null ? usedLeave : 0.0;
+    public AnnualLeaveHistory(Long memberId, LocalDate startDate, LocalDate endDate, Long approverId) {
+        this.memberId = memberId;
         this.startDate = startDate;
         this.endDate = endDate;
         this.approverId = approverId;
+
+        this.usedLeave = (int)ChronoUnit.DAYS.between(startDate, endDate) + 1;
     }
+
 }
