@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 /* 12.06 UserDetails 부분이 완성이 되면 모든 메소드의 Long userId는 Userdetials로 교체할 것 */
@@ -45,7 +46,7 @@ public class DocumentService {
 
         // 결재선 저장
         List<Long> approvalIds = requestDto.getApproverIds();
-        validateApproverList(approvalIds);
+        validateApproverList(approvalIds, memberId);
 
         /* (추후 구현) memberRepository에서 해당 멤버가 존재하는지 getDraftId로 판독 */
 
@@ -63,16 +64,16 @@ public class DocumentService {
                         .build();
 
         ApprovalDocument savedDoc = approvalDocumentRepository.save(approvalDocument);
-        Long documentId = savedDoc.getId();
+        Long docId = savedDoc.getId();
 
         // 결재선 등록
-        createApprovalLines(documentId, approvalIds);
+        createApprovalLines(docId, approvalIds);
 
         // 참조자 설정
         if(requestDto.getReferrer() != null) {
             for(Long referrerId : requestDto.getReferrer()) {
                 ApprovalReferrer approvalReferrer = ApprovalReferrer.builder()
-                        .document(documentId)
+                        .document(docId)
                         .referrer(referrerId)
                         .viewedAt(null)
                         .build();
@@ -83,7 +84,7 @@ public class DocumentService {
 
         // 결재 로그 저장
         ApprovalHistory approvalHistory = ApprovalHistory.builder()
-                .document(documentId)
+                .document(docId)
                 .actor(memberId)
                 .actionType(ActionTypeEnum.CREATE)
                 .build();
@@ -96,7 +97,7 @@ public class DocumentService {
     @Transactional
     public void updateDocument(Long memberId, Long docId, UpdateDocumentRequestDto requestDto) {
         List<Long> approvalIds = requestDto.getApproverIds();
-        validateApproverList(approvalIds);
+        validateApproverList(approvalIds, memberId);
 
         ApprovalDocument approvalDocument = validateUpdateAuthority(memberId, docId);
 
@@ -106,6 +107,15 @@ public class DocumentService {
                 requestDto.getStartVacationDate(),
                 requestDto.getEndVacationDate()
         );
+
+        ApprovalHistory approvalHistory = ApprovalHistory.builder()
+                .document(docId)
+                .actor(memberId)
+                .actionType(ActionTypeEnum.UPDATE)
+                .comment(requestDto.getUpdateComment())
+                .build();
+
+        approvalHistoryRepositoy.save(approvalHistory);
 
         approvalLineRepository.deleteByDocumentId(docId);
         createApprovalLines(docId, approvalIds);
@@ -151,25 +161,125 @@ public class DocumentService {
                         .build()
         ).toList();
 
-       DocumentDetailResponseDto responseDto = DocumentDetailResponseDto.builder()
-               .documentId(docId)
-               .title(document.getTitle())
-               .content(document.getContent())
-               .docStatus(document.getDocStatus())
-               .drafterId(document.getDrafter())
-               .startVacationDate(document.getStartVacationDate())
-               .endVacationDate(document.getEndVacationDate())
-               .createdAt(document.getCreatedAt())
-               .approvers(approvalLinesResponseDto)
-               .referrers(referrerResponseDto)
-               .build();
+        return DocumentDetailResponseDto.builder()
+                .documentId(docId)
+                .title(document.getTitle())
+                .content(document.getContent())
+                .docStatus(document.getDocStatus())
+                .drafterId(document.getDrafter())
+                .startVacationDate(document.getStartVacationDate())
+                .endVacationDate(document.getEndVacationDate())
+                .createdAt(document.getCreatedAt())
+                .approvers(approvalLinesResponseDto)
+                .referrers(referrerResponseDto)
+                .build();
+    }
 
-       return responseDto;
+    //     기안자, 결재자, 참조자 아니면 읽지 못 하게.
+//     그 후 ApprovalHistory에 action은 결재자, READ로 변경하고 읽은 시간도 추가하는 로그를 남기는 메소드 생성
+    //  ActionTypeEnum.READ는 새로운 로그를 추가하는 행위 (상태 변경 아님)
+//  ApprovalHistory: READ 로그 기록. (문서 열람 시간 추적)
+//  ApprovalReferrer: 참조자가 열람 시 viewedAt 필드를 현재 시간으로 업데이트.
+//  ApprovalLine: 결재자가 열람해도 LineStatus는 WAIT 상태 유지.
+    @Transactional
+    public void writeReadHistory(Long docId, Long memberId) {
+
+        // 문서가 존재하는지
+        ApprovalDocument approvalDocument = approvalDocumentRepository.findById(docId).orElseThrow(
+                () -> new BusinessException(ErrorCode.DOCUMENT_NOT_FOUND)
+        );
+
+        // 기안자 본인이면 로그 기록 하지 않음
+        if(approvalDocument.isSameDrafter(memberId)) {
+            return;
+        }
+
+        // 이 사람이 결재자인지
+        boolean isApprover = approvalLineRepository.existsByDocumentAndApprover(docId, memberId);
+
+        // 이 사람이 참조자인지, 참조자가 아니면 null 반환
+        ApprovalReferrer approvalReferrer = approvalReferrerRepository.findByDocumentAndReferrer(docId, memberId)
+                .orElse(null);
+
+        // 둘다 아니면 에러 처리
+        if(!isApprover && approvalReferrer == null) {
+            throw new BusinessException(ErrorCode.NO_READ_AUTHORIZATION);
+        }
+
+        // 참조자일 경우 읽은 시간 설정
+        if(approvalReferrer != null) {
+            approvalReferrer.updateViewedAt();
+        }
+
+        ApprovalHistory approvalHistory = ApprovalHistory.builder()
+                .document(docId)
+                .actor(memberId)
+                .actionType(ActionTypeEnum.READ)
+                .build();
+        approvalHistoryRepositoy.save(approvalHistory);
     }
 
     @Transactional(readOnly = true)
     public Page<DocumentListResponseDto> getTempDocumentList(Long memberId, Pageable pageable) {
         Page<ApprovalDocument> documentList = approvalDocumentRepository.findByDocStatusAndDrafterOrderByCreatedAtDesc(DocStatusEnum.TEMP, memberId, pageable);
+
+        return getResponseDto(documentList);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<DocumentListResponseDto> getProgressDocumentList(Long memberId, Pageable pageable) {
+        Page<ApprovalDocument> documentList = approvalDocumentRepository.findByDocStatusAndDrafterOrderByCreatedAtDesc(DocStatusEnum.IN_PROGRESS, memberId, pageable);
+
+        return getResponseDto(documentList);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<DocumentListResponseDto> getClosedDocumentList(Long memberId, Pageable pageable) {
+        List<DocStatusEnum> statuses = Arrays.asList(DocStatusEnum.APPROVED, DocStatusEnum.REJECTED);
+        Page<ApprovalDocument> documentList = approvalDocumentRepository.findByDrafterAndDocStatusInOrderByCreatedAtDesc(memberId, statuses, pageable);
+
+        return getResponseDto(documentList);
+    }
+
+    /* 결재 대기함 (자신이 결재해야 될 문서 목록) */
+    @Transactional(readOnly = true)
+    public Page<DocumentListResponseDto> getDocumentsToApprove(Long memberId, Pageable pageable) {
+
+        // 우선 전체 문서중, 멤버ID가 포함되고 그 포함된 결재선의 시퀀스와 문서의 시퀀스가 같은 것들의 문서를 불러와야함
+        // 그럼 그 문서를 ResponseDTO에 담아서 return
+        // 접근 권한 넣기
+        Page<ApprovalDocument> documentList = approvalDocumentRepository.findDocumentsToApprove(memberId, pageable);
+        return getResponseDto(documentList);
+    }
+
+    /* 기결재함(자신이 승인/반려 처리 한 문서 목록) */
+    @Transactional(readOnly = true)
+    public Page<DocumentListResponseDto> getProcessedDocuments(Long memberId, Pageable pageable) {
+
+        /*
+        * 1. History의 기안 id = Document의 기안 id
+        * 2. History의 actor = memberId
+        * 3. History에 타입이 APPROVE 혹은 REJECT 인것
+        * 4. Document에 TEMP만 아니면 됨
+        * */
+        Page<ApprovalDocument> documentList = approvalDocumentRepository.findProcessedDocuments(memberId, pageable);
+        return getResponseDto(documentList);
+    }
+
+    /* 참조 문서함(참조자로 지정된 문서 목록) */
+    @Transactional(readOnly = true)
+    public Page<DocumentListResponseDto> getReferencedDocuments(Long  memberId, Pageable pageable) {
+        /*
+        * 1. Referrer의 기안 id = Document의 기안 id
+        * 2. Refferer의 referrer = memberId
+        * 3.
+        * */
+        Page<ApprovalDocument> documentList = approvalDocumentRepository.findReferencedDocuments(memberId, pageable);
+        return getResponseDto(documentList);
+
+    }
+
+    private Page<DocumentListResponseDto> getResponseDto(Page<ApprovalDocument> documentList) {
 
         return documentList.map(document ->
                 DocumentListResponseDto.builder()
@@ -178,7 +288,7 @@ public class DocumentService {
                         .status(document.getDocStatus())
                         .createdDate(document.getCreatedAt())
                         .build()
-        );
+                );
     }
 
     private ApprovalDocument validateUpdateAuthority(Long userId, Long docId) {
@@ -213,7 +323,7 @@ public class DocumentService {
         return approvalDocument;
     }
 
-    private void validateApproverList(List<Long> approvalIds) {
+    private void validateApproverList(List<Long> approvalIds, Long memberId) {
         if (approvalIds == null || approvalIds.isEmpty()) {
             throw new BusinessException(ErrorCode.APPROVER_REQUIRED);
         }
@@ -221,9 +331,24 @@ public class DocumentService {
         if (approvalIds.size() != 3) {
             throw new BusinessException(ErrorCode.INVALID_APPROVER_COUNT);
         }
+
+        // 기안자 = 결재자 방지
+        if (approvalIds.stream().anyMatch(approverId -> approverId.equals(memberId))) {
+            throw new BusinessException(ErrorCode.DRAFTER_EQUALS_APPROVER);
+        }
+
+        long existingApproverCount = memberRepository.countAllByIdIn(approvalIds);
+
+        if (existingApproverCount != approvalIds.size()) {
+            throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
+        }
     }
 
     private void createApprovalLines(Long docId, List<Long> approvalIds) {
+
+        if (!approvalDocumentRepository.existsById(docId)) {
+            throw new BusinessException(ErrorCode.DOCUMENT_NOT_FOUND);
+        }
 
         for(int i = 0; i < approvalIds.size(); i++) {
             ApprovalLine newLine = ApprovalLine.builder()
