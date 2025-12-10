@@ -14,15 +14,22 @@ import java.util.Optional;
 public interface ApprovalLineRepository extends JpaRepository<ApprovalLine, Long> {
     @Transactional
     @Query("DELETE FROM ApprovalLine al WHERE al.document = :docId")
-    @Modifying(clearAutomatically = true)
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     void deleteByDocumentId(@Param("docId") Long docId);
 
     List<ApprovalLine> findByDocumentOrderBySequence(Long document);
 
     @Transactional
-    @Query("UPDATE ApprovalLine al SET al.lineStatus = :status WHERE al.document = :docId AND al.sequence = :sequence")
-    @Modifying(clearAutomatically = true)
-    void updateLineStatusByDocumentAndSequence(Long docId, int sequence, LineStatusEnum lineStatusEnum);
+    @Query("UPDATE ApprovalLine al " +
+            "SET al.lineStatus = :status " +
+            "WHERE al.document = :docId " +
+            "AND al.sequence = :seq")
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    void updateLineStatusByDocumentAndSequence(
+            @Param("docId") Long docId,
+            @Param("seq") int seq,
+            @Param("status") LineStatusEnum status
+    );
 
     Optional<ApprovalLine> findByDocumentAndSequence(Long docId, int sequence);
 

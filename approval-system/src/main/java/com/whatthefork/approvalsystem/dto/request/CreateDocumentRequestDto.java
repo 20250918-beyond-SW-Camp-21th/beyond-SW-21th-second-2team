@@ -24,6 +24,7 @@ public class CreateDocumentRequestDto {
     private List<Long> approverIds;
 
     // 참조자, 선택사항
+    @Size(max = 5)
     private List<Long> referrer;
 
     @NotNull(message = "휴가 시작 일자는 필수로 지정해야 합니다.")

@@ -134,13 +134,17 @@ public class DocumentService {
                 () -> new BusinessException(ErrorCode.DOCUMENT_NOT_FOUND)
         );
 
-       if(!document.isSameDrafter(memberId)) {
-           throw new BusinessException(ErrorCode.NOT_DRAFTER);
-       }
-
        /* 문서 아이디로 결재선과 참조자 목록을 모두 가져옴 */
        List<ApprovalLine> approvalLines = approvalLineRepository.findByDocumentOrderBySequence(docId);
        List<ApprovalReferrer> referrers = approvalReferrerRepository.findByDocumentOrderByViewedAt(docId);
+
+        boolean isDrafter = document.isSameDrafter(memberId);
+        boolean isApprover = approvalLines.stream().anyMatch(line -> line.getApprover().equals(memberId));
+        boolean isReferrer = referrers.stream().anyMatch(ref -> ref.getReferrer().equals(memberId));
+
+        if (!isDrafter && !isApprover && !isReferrer) {
+            throw new BusinessException(ErrorCode.NO_READ_AUTHORIZATION);
+        }
 
         List<ApprovalLineResponseDto> approvalLinesResponseDto = approvalLines.stream()
                 .map(line -> ApprovalLineResponseDto.builder()
@@ -221,14 +225,14 @@ public class DocumentService {
 
     @Transactional(readOnly = true)
     public Page<DocumentListResponseDto> getTempDocumentList(Long memberId, Pageable pageable) {
-        Page<ApprovalDocument> documentList = approvalDocumentRepository.findByDocStatusAndDrafterOrderByCreatedAtDesc(DocStatusEnum.TEMP, memberId, pageable);
+        Page<ApprovalDocument> documentList = approvalDocumentRepository.findByDocStatusAndDrafter(DocStatusEnum.TEMP, memberId, pageable);
 
         return getResponseDto(documentList);
     }
 
     @Transactional(readOnly = true)
     public Page<DocumentListResponseDto> getProgressDocumentList(Long memberId, Pageable pageable) {
-        Page<ApprovalDocument> documentList = approvalDocumentRepository.findByDocStatusAndDrafterOrderByCreatedAtDesc(DocStatusEnum.IN_PROGRESS, memberId, pageable);
+        Page<ApprovalDocument> documentList = approvalDocumentRepository.findByDocStatusAndDrafter(DocStatusEnum.IN_PROGRESS, memberId, pageable);
 
         return getResponseDto(documentList);
     }
@@ -236,7 +240,7 @@ public class DocumentService {
     @Transactional(readOnly = true)
     public Page<DocumentListResponseDto> getClosedDocumentList(Long memberId, Pageable pageable) {
         List<DocStatusEnum> statuses = Arrays.asList(DocStatusEnum.APPROVED, DocStatusEnum.REJECTED);
-        Page<ApprovalDocument> documentList = approvalDocumentRepository.findByDrafterAndDocStatusInOrderByCreatedAtDesc(memberId, statuses, pageable);
+        Page<ApprovalDocument> documentList = approvalDocumentRepository.findByDrafterAndDocStatusIn(memberId, statuses, pageable);
 
         return getResponseDto(documentList);
     }
