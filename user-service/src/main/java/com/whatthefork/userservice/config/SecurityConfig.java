@@ -40,7 +40,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(restAccessDeniedHandler)
         )
         .authorizeHttpRequests(auth ->
-                auth.requestMatchers(HttpMethod.POST, "/users", "/auth/login", "/auth/refresh", "/auth/logout").permitAll()
+                auth.requestMatchers(HttpMethod.POST, "/register", "/auth/login", "/auth/refresh", "/auth/logout").permitAll()
                         .requestMatchers("/users/me").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers(
