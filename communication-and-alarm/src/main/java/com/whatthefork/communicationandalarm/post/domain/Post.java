@@ -40,8 +40,6 @@ public class Post extends BaseEntity {
     @Column(name = "is_deleted", nullable = false)
     public Boolean isDeleted = false;
 
-
-
     public static Post create(Long memberId, String memberName, String title, String content, Category category) {
 
         boolean pinned = (category == Category.ANNOUNCEMENT);
