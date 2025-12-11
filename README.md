@@ -1,4 +1,4 @@
-# 사내 전자결재 시스템 ON:S
+# 💻 사내 인프라 솔루션, ON:S 💻
 ### > **휴가, 사내 커뮤니티, 회사 자원 사용 예약까지 한 번에**
 
 </br>
@@ -488,6 +488,9 @@ develop & main branch로 merge할 때에는 pull request가 필요합니다. pul
 [feat] 약속 잡기 API 구현
 <br/>[chore] spring data JPA 의존성 추가
 
+</div>
+</details>
+
 </br>
 
 ----
@@ -529,64 +532,35 @@ develop & main branch로 merge할 때에는 pull request가 필요합니다. pul
 <details>
 <summary style = " font-size:1.3em;">강윤혜</summary>
 <div markdown="1">
-
+회고 입력
 </div>
 </details>
 
 <details>
 <summary style = " font-size:1.3em;">김채우</summary>
 <div markdown="1">
-
+회고 입력
 </div>
 </details>
 
 <details>
 <summary style = " font-size:1.3em;">윤홍석</summary>
 <div markdown="1">
-
+회고 입력
 </div>
 </details>
 
 <details>
 <summary style = " font-size:1.3em;">송형욱</summary>
 <div markdown="1">
-
+회고 입력
 </div>
 </details>
 
 <details>
 <summary style = " font-size:1.3em;">진희헌</summary>
 <div markdown="1">
-
+회고 입력
 </div>
 </details>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</div>
-</details>
