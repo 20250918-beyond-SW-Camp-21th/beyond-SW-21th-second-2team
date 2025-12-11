@@ -144,6 +144,9 @@
 
 ## 6. 프로젝트 기획
 ### 요구사항 명세서
+<img width="2339" height="1653" alt="백엔드 2조 xlsx - 요구사항 정의서-1" src="https://github.com/user-attachments/assets/ceaf6e97-d8c1-4a32-9818-9a8e18d3befc" />
+<img width="2339" height="1653" alt="백엔드 2조 xlsx - 요구사항 정의서-2" src="https://github.com/user-attachments/assets/b10a0813-1dee-4f5f-8854-f36e88b3012f" />
+
 ### 테이블 정의서
 
 <details>
@@ -233,7 +236,9 @@
 </details>
 
 ### WBS
-<img width="2339" height="1653" alt="백엔드 2조-1" src="https://github.com/user-attachments/assets/b0a14e97-5ed6-4f1d-a7c7-1bfdf9edcb31" />
+<img width="2339" height="1653" alt="백엔드 2조 xlsx - WBS-1" src="https://github.com/user-attachments/assets/74bc66c8-0100-4347-a81e-ab6f1b1e5cbd" />
+<img width="2339" height="1653" alt="백엔드 2조 xlsx - WBS-2" src="https://github.com/user-attachments/assets/9fdc579f-2c48-4f61-b20f-64c1834ab3e2" />
+
 
 </br>
 
