@@ -20,16 +20,16 @@
 <table width="100%">
   <thead>
     <tr align="center">
-      <th width="20%">김채우🍇</th>
-      <th width="20%">김세현🍅</th>
-      <th width="20%">김성은🍋</th>
-      <th width="20%">양승재🍊</th>
-      <th width="20%">정하경🍏</th>
+      <th width="20%">강윤혜🐼/th>
+      <th width="20%">김채우🐾/th>
+      <th width="20%">송형욱🦉/th>
+      <th width="20%">윤홍석🐿️/th>
+      <th width="20%">진희헌🦍</th>
     </tr>
   </thead>
   <tbody>
     <tr align="center">
-      <td><img src="https://github.com/user-attachments/assets/95d93ca5-ed6c-42b8-8ab1-54608c255b6f" width="60%" /></td>
+      <td><img src= "https://github.com/user-attachments/assets/826e640b-c388-4dba-9fa7-2414242fa3f1" width="60%" /></td>
       <td><img src="https://github.com/user-attachments/assets/34156882-bfdf-4536-bdf5-67b5c139e4ca" width="60%" /></td>
       <td><img src="https://github.com/user-attachments/assets/0e7cb364-3ce2-4729-87f9-94ba1eb31af9" width="60%" /></td>
       <td><img src="https://github.com/user-attachments/assets/dd56732e-3798-4b10-8d32-ef5a3d0da673" width="60%" /></td>
