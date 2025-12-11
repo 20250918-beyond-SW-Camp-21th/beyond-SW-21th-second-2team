@@ -5,7 +5,6 @@ import com.whatthefork.approvalsystem.feign.dto.LeaveAnnualRequestDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(name = "attendancetracking", url="http://localhost:8000", configuration = FeignConfig.class)
 public interface AnnualLeaveFeignClient {

@@ -42,7 +42,7 @@ public class DocumentController {
     public ResponseEntity<ApiResponse> createDocument(
             @AuthenticationPrincipal String memberId,
             @RequestBody @Valid CreateDocumentRequestDto requestDto) {
-        Long docId = documentService.createDocument(Long.valueOf(memberId), requestDto);
+        Long docId = documentService.createDocument(memberId, requestDto);
         return ResponseEntity.ok(ApiResponse.success(docId));
     }
 
@@ -110,10 +110,10 @@ public class DocumentController {
     })
     @GetMapping("/{docId}")
     public ResponseEntity<ApiResponse> getDocumentDetail(
-            @AuthenticationPrincipal String memberId,
+            @AuthenticationPrincipal String memberIdStr,
             @PathVariable Long docId) {
-        documentService.writeReadHistory(docId, Long.valueOf(memberId));
-        DocumentDetailResponseDto response = documentService.readDetailDocument(Long.valueOf(memberId), docId);
+        documentService.writeReadHistory(docId, memberIdStr);
+        DocumentDetailResponseDto response = documentService.readDetailDocument(memberIdStr, docId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 

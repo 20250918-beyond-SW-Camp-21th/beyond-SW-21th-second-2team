@@ -31,6 +31,9 @@ public class ApprovalDocument {
     @Column(name = "drafter_id", nullable = false)
     private Long drafter;
 
+    @Column(name = "drafter_name", nullable = false)
+    private String drafterName;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "doc_status", nullable = false)
     private DocStatusEnum docStatus; // ENUM: TEMP, IN_PROGRESS, APPROVED, REJECTED
@@ -60,7 +63,7 @@ public class ApprovalDocument {
     private boolean isDeleted;
 
     @Builder
-    public ApprovalDocument(Long drafter, DocStatusEnum docStatus, String title, String content, Long version, int currentSequence, LocalDateTime createdAt, LocalDate startVacationDate, LocalDate endVacationDate) {
+    public ApprovalDocument(Long drafter, DocStatusEnum docStatus, String title, String content, Long version, int currentSequence, LocalDateTime createdAt, LocalDate startVacationDate, LocalDate endVacationDate, String drafterName) {
         this.drafter = drafter;
         this.docStatus = docStatus;
         this.title = title;
@@ -70,6 +73,7 @@ public class ApprovalDocument {
         this.createdAt = createdAt;
         this.startVacationDate = startVacationDate;
         this.endVacationDate = endVacationDate;
+        this.drafterName = drafterName;
     }
 
     public void submit() {

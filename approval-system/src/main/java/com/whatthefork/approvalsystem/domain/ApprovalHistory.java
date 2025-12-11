@@ -34,6 +34,9 @@ public class ApprovalHistory {
     @Column(name = "actor_id", nullable = false)
     private Long actor;
 
+    @Column(name = "actor_name",  nullable = false)
+    private String actorName;
+
     @Column(nullable = false)
     private LocalDateTime viewedAt;
 
@@ -50,9 +53,10 @@ public class ApprovalHistory {
     private ApprovalHistory parent;
 
     @Builder
-    public ApprovalHistory(Long document, Long actor, ActionTypeEnum actionType, String comment, ApprovalHistory parent) {
+    public ApprovalHistory(Long document, Long actor, ActionTypeEnum actionType, String comment, ApprovalHistory parent, String actorName) {
         this.document = document;
         this.actor = actor;
+        this.actorName = actorName;
         this.viewedAt = LocalDateTime.now();
         this.actionType = actionType;
         this.comment = comment;

@@ -1,5 +1,6 @@
 package com.whatthefork.approvalsystem.service;
 
+import com.whatthefork.approvalsystem.common.ApiResponse;
 import com.whatthefork.approvalsystem.common.error.BusinessException;
 import com.whatthefork.approvalsystem.common.error.ErrorCode;
 import com.whatthefork.approvalsystem.domain.ApprovalDocument;
@@ -16,6 +17,8 @@ import com.whatthefork.approvalsystem.dto.response.ReferrerResponseDto;
 import com.whatthefork.approvalsystem.enums.ActionTypeEnum;
 import com.whatthefork.approvalsystem.enums.DocStatusEnum;
 import com.whatthefork.approvalsystem.enums.LineStatusEnum;
+import com.whatthefork.approvalsystem.feign.client.UserFeignClient;
+import com.whatthefork.approvalsystem.feign.dto.UserDetailResponse;
 import com.whatthefork.approvalsystem.repository.ApprovalDocumentRepository;
 import com.whatthefork.approvalsystem.repository.ApprovalHistoryRepositoy;
 import com.whatthefork.approvalsystem.repository.ApprovalLineRepository;
@@ -30,7 +33,6 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-/* 12.06 UserDetails 부분이 완성이 되면 모든 메소드의 Long userId는 Userdetials로 교체할 것 */
 @Service
 @RequiredArgsConstructor
 public class DocumentService {
@@ -40,19 +42,22 @@ public class DocumentService {
     private final ApprovalHistoryRepositoy approvalHistoryRepositoy;
     private final ApprovalReferrerRepository approvalReferrerRepository;
     private final MemberRepository memberRepository;
+    private final UserFeignClient userFeignClient;
 
     @Transactional
-    public Long createDocument(Long memberId, CreateDocumentRequestDto requestDto) {
+    public Long createDocument(String memberIdStr, CreateDocumentRequestDto requestDto) {
+
+        Long memberId = Long.parseLong(memberIdStr);
+        String drafterName = getUserName(memberId);
 
         // 결재선 저장
         List<Long> approvalIds = requestDto.getApproverIds();
         validateApproverList(approvalIds, memberId);
 
-        /* (추후 구현) memberRepository에서 해당 멤버가 존재하는지 getDraftId로 판독 */
-
         // 기안 작성
         ApprovalDocument approvalDocument = ApprovalDocument.builder()
                         .drafter(memberId)
+                        .drafterName(drafterName)
                         .title(requestDto.getTitle())
                         .content(requestDto.getContent())
                         .createdAt(LocalDateTime.now())
@@ -86,6 +91,7 @@ public class DocumentService {
         ApprovalHistory approvalHistory = ApprovalHistory.builder()
                 .document(docId)
                 .actor(memberId)
+                .actorName(getUserName(memberId))
                 .actionType(ActionTypeEnum.CREATE)
                 .build();
 
@@ -111,6 +117,7 @@ public class DocumentService {
         ApprovalHistory approvalHistory = ApprovalHistory.builder()
                 .document(docId)
                 .actor(memberId)
+                .actorName(getUserName(memberId))
                 .actionType(ActionTypeEnum.UPDATE)
                 .comment(requestDto.getUpdateComment())
                 .build();
@@ -127,9 +134,10 @@ public class DocumentService {
         approvalDocument.deleteDocument();
     }
 
-
     @Transactional(readOnly = true)
-    public DocumentDetailResponseDto readDetailDocument(Long memberId, Long docId) {
+    public DocumentDetailResponseDto readDetailDocument(String memberIdStr, Long docId) {
+        Long memberId = Long.parseLong(memberIdStr);
+
        ApprovalDocument document = approvalDocumentRepository.findById(docId).orElseThrow(
                 () -> new BusinessException(ErrorCode.DOCUMENT_NOT_FOUND)
         );
@@ -149,7 +157,7 @@ public class DocumentService {
         List<ApprovalLineResponseDto> approvalLinesResponseDto = approvalLines.stream()
                 .map(line -> ApprovalLineResponseDto.builder()
                         .approverId(line.getApprover())
-                        .approverName("임시 이름") // 12.08 memberRepository 연동 후 수정 예정
+                        .approverName(getUserName(line.getApprover()))
                         .sequence(line.getSequence())
                         .status(line.getLineStatus())
                         .approvedAt(line.getApprovedAt())
@@ -160,7 +168,7 @@ public class DocumentService {
         List<ReferrerResponseDto> referrerResponseDto = referrers.stream().map(
                 referrer -> ReferrerResponseDto.builder()
                         .referrerId(referrer.getReferrer())
-                        .referrerName("임시 이름") // 12.08 memberRepository 연동 후 수정
+                        .referrerName(getUserName(referrer.getReferrer()))
                         .viewedAt(referrer.getViewedAt())
                         .build()
         ).toList();
@@ -171,6 +179,7 @@ public class DocumentService {
                 .content(document.getContent())
                 .docStatus(document.getDocStatus())
                 .drafterId(document.getDrafter())
+                .drafterName(getUserName(document.getDrafter()))
                 .startVacationDate(document.getStartVacationDate())
                 .endVacationDate(document.getEndVacationDate())
                 .createdAt(document.getCreatedAt())
@@ -179,14 +188,10 @@ public class DocumentService {
                 .build();
     }
 
-    //     기안자, 결재자, 참조자 아니면 읽지 못 하게.
-//     그 후 ApprovalHistory에 action은 결재자, READ로 변경하고 읽은 시간도 추가하는 로그를 남기는 메소드 생성
-    //  ActionTypeEnum.READ는 새로운 로그를 추가하는 행위 (상태 변경 아님)
-//  ApprovalHistory: READ 로그 기록. (문서 열람 시간 추적)
-//  ApprovalReferrer: 참조자가 열람 시 viewedAt 필드를 현재 시간으로 업데이트.
-//  ApprovalLine: 결재자가 열람해도 LineStatus는 WAIT 상태 유지.
     @Transactional
-    public void writeReadHistory(Long docId, Long memberId) {
+    public void writeReadHistory(Long docId, String memberIdStr) {
+
+        Long memberId = Long.valueOf(memberIdStr);
 
         // 문서가 존재하는지
         ApprovalDocument approvalDocument = approvalDocumentRepository.findById(docId).orElseThrow(
@@ -218,6 +223,7 @@ public class DocumentService {
         ApprovalHistory approvalHistory = ApprovalHistory.builder()
                 .document(docId)
                 .actor(memberId)
+                .actorName(getUserName(memberId))
                 .actionType(ActionTypeEnum.READ)
                 .build();
         approvalHistoryRepositoy.save(approvalHistory);
@@ -249,9 +255,6 @@ public class DocumentService {
     @Transactional(readOnly = true)
     public Page<DocumentListResponseDto> getDocumentsToApprove(Long memberId, Pageable pageable) {
 
-        // 우선 전체 문서중, 멤버ID가 포함되고 그 포함된 결재선의 시퀀스와 문서의 시퀀스가 같은 것들의 문서를 불러와야함
-        // 그럼 그 문서를 ResponseDTO에 담아서 return
-        // 접근 권한 넣기
         Page<ApprovalDocument> documentList = approvalDocumentRepository.findDocumentsToApprove(memberId, pageable);
         return getResponseDto(documentList);
     }
@@ -260,12 +263,6 @@ public class DocumentService {
     @Transactional(readOnly = true)
     public Page<DocumentListResponseDto> getProcessedDocuments(Long memberId, Pageable pageable) {
 
-        /*
-        * 1. History의 기안 id = Document의 기안 id
-        * 2. History의 actor = memberId
-        * 3. History에 타입이 APPROVE 혹은 REJECT 인것
-        * 4. Document에 TEMP만 아니면 됨
-        * */
         Page<ApprovalDocument> documentList = approvalDocumentRepository.findProcessedDocuments(memberId, pageable);
         return getResponseDto(documentList);
     }
@@ -273,11 +270,7 @@ public class DocumentService {
     /* 참조 문서함(참조자로 지정된 문서 목록) */
     @Transactional(readOnly = true)
     public Page<DocumentListResponseDto> getReferencedDocuments(Long  memberId, Pageable pageable) {
-        /*
-        * 1. Referrer의 기안 id = Document의 기안 id
-        * 2. Refferer의 referrer = memberId
-        * 3.
-        * */
+
         Page<ApprovalDocument> documentList = approvalDocumentRepository.findReferencedDocuments(memberId, pageable);
         return getResponseDto(documentList);
 
@@ -363,6 +356,21 @@ public class DocumentService {
                     .build();
 
             approvalLineRepository.save(newLine);
+        }
+    }
+
+    private String getUserName(Long userId) {
+
+        try {
+            ApiResponse<UserDetailResponse> response = userFeignClient.findUserDetail(userId);
+
+            if(response != null && response.getData() != null && response.getData().getUser() != null) {
+                return response.getData().getUser().getName();
+            }
+            return "알 수 없는 유저입니다.";
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return "알 수 없는 유저입니다.";
         }
     }
 }

@@ -20,6 +20,7 @@ public class DocumentDetailResponseDto {
 
     // 기안자 정보
     private Long drafterId;
+    private String drafterName;
 
     // 날짜 정보
     private LocalDate startVacationDate;
