@@ -49,11 +49,11 @@ public class AnnualLeaveController {
     }
 
     @PostMapping("/decrease")
-    public ResponseEntity<Void> decreaseAnnual(@RequestBody LeaveAnnualRequestDto requestDto){
+    public ResponseEntity<ApiResponse> decreaseAnnual(@RequestBody LeaveAnnualRequestDto requestDto){
 
         annualLeaveService.decreaseAnnual(requestDto);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(success("success"));
     }
 
 

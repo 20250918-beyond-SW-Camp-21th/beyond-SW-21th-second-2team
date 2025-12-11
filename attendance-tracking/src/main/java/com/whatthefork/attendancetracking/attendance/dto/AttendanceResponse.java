@@ -31,7 +31,7 @@ public class AttendanceResponse {
 
     private static String formatPunchIn(Attendance attendance) {
 
-        String punchIn = attendance.getPunchInDate().format(DateTimeFormatter.ofPattern("HH:MM"));
+        String punchIn = attendance.getPunchInDate().format(DateTimeFormatter.ofPattern("HH:mm"));
 
         if(attendance.isLate()){
             punchIn += "(지각: "+attendance.getLateMinutes() + "분)";
@@ -45,7 +45,7 @@ public class AttendanceResponse {
         if(attendance.getPunchOutDate()==null){
             return "-";
         }
-        String punchOut = attendance.getPunchOutDate().format(DateTimeFormatter.ofPattern("HH:MM"));
+        String punchOut = attendance.getPunchOutDate().format(DateTimeFormatter.ofPattern("HH:mm"));
 
         return punchOut;
     }

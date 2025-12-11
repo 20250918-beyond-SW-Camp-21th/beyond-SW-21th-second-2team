@@ -25,4 +25,6 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     Optional<Attendance> findByUserIdAndPunchInDateBetweenOrderByPunchInDateAsc(Long userId, LocalDateTime startDate, LocalDateTime endDate);
 
     List<Attendance> findAllByUserIdAndPunchInDateBetweenOrderByPunchInDateAsc(Long userId, LocalDateTime startDate, LocalDateTime endDate);
+
+    boolean findAttendanceByUserIdAndPunchOutDate(Long userId, LocalDateTime punchOutDate);
 }

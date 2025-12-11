@@ -85,15 +85,29 @@ public class AnnualLeaveService {
     @Transactional
     public AnnualLeaveHistoryResponse decreaseAnnual(LeaveAnnualRequestDto requestDto) {
 
-        AnnualLeave annualLeave = annualLeaveRepository.findByMemberIdAndYear(requestDto.getMemberId(), requestDto.getStartDate().getYear());
+        AnnualLeave annualLeave = annualLeaveRepository
+                .findByMemberIdAndYear(requestDto.getMemberId(), requestDto.getStartDate().getYear());
 
         annualLeave.decreaseAnnual(requestDto.getStartDate(), requestDto.getEndDate());
 
-        return AnnualLeaveHistoryResponse.builder()
+        int usedLeave = (int)ChronoUnit.DAYS.between(requestDto.getStartDate(), requestDto.getEndDate()) + 1;
+
+        AnnualLeaveHistory history = AnnualLeaveHistory.builder()
                 .memberId(requestDto.getMemberId())
+                .usedLeave(usedLeave)
                 .startDate(requestDto.getStartDate())
                 .endDate(requestDto.getEndDate())
                 .approverId(requestDto.getApproverId())
+                .build();
+
+        annualLeaveHistoryRepository.save(history);
+
+        return AnnualLeaveHistoryResponse.builder()
+                .memberId(history.getMemberId())
+                .usedLeave(history.getUsedLeave())
+                .startDate(history.getStartDate())
+                .endDate(history.getEndDate())
+                .approverId(history.getApproverId())
                 .build();
     }
 }

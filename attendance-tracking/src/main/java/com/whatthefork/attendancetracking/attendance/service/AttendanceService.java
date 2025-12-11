@@ -43,13 +43,15 @@ public class AttendanceService {
 
         boolean isLate = now.toLocalTime().isAfter(START_TIME);
 
-        if(nowTime.isBefore(CHECK_IN_ALLOWED_TIME)){
-            throw new BusinessException(ErrorCode.ATTENDANCE_NOT_CHECK_IN_TIME);
-        }
 
         if(attendanceRepository.findAttendanceByUserId(userId,start,end).isPresent()){
             throw new BusinessException(ErrorCode.ATTENDANCE_ALREADY_CHECKED_IN);
         }
+
+        if(nowTime.isBefore(CHECK_IN_ALLOWED_TIME)){
+            throw new BusinessException(ErrorCode.ATTENDANCE_NOT_CHECK_IN_TIME);
+        }
+
 
         int lateMinutes = isLate ?
                 (int)Duration.between(START_TIME,nowTime).toMinutes()
@@ -74,9 +76,14 @@ public class AttendanceService {
     @Transactional
     public void checkOut(Long userId){
 
+
         Attendance attendance = attendanceRepository
                 .findTopByUserIdAndPunchOutDateIsNullOrderByPunchInDateDesc(userId)
                 .orElseThrow(()-> new BusinessException(ErrorCode.ATTENDANCE_NOT_CHECKED_IN));
+
+        if(attendanceRepository.findAttendanceByUserIdAndPunchOutDate(userId,attendance.getPunchOutDate())){
+            throw new BusinessException(ErrorCode.ATTENDANCE_ALREADY_CHECKED_OUT);
+        }
 
         LocalDateTime now = LocalDateTime.now();
 
