@@ -34,10 +34,15 @@ public class AnnualLeaveService {
 
         AnnualLeave annualLeave = annualLeaveRepository.findByMemberIdAndYear(memberId, year);
 
+        if (annualLeave == null) {
+            throw new BusinessException(ErrorCode.ANNUAL_LEAVE_NOT_FOUND);
+        }
+
         LocalDate start = LocalDate.of(year, 1, 1);
         LocalDate end = LocalDate.of(year, 12, 31);
 
         List<AnnualLeaveHistory> histories = annualLeaveHistoryRepository.findByMemberIdAndStartDateBetween(memberId, start, end);
+
 
         int usedLeave = histories
                 .stream()
