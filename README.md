@@ -1,5 +1,5 @@
 # 사내 전자결재 시스템 ON:S
-> **휴가, 사내 커뮤니티, 회사 자원 사용 예약까지 한 번에**
+### > **휴가, 사내 커뮤니티, 회사 자원 사용 예약까지 한 번에**
 
 </br>
 
@@ -16,8 +16,7 @@
 ### 6. 프로젝트 기획
 ### 7. 컨벤션
 ### 8. 프로젝트 기능
-### 9. 서버
-### 10. 회고
+### 9. 회고
 
 </br>
 
@@ -135,7 +134,97 @@
 </br>
 
 ## 6. 프로젝트 기획
+### 요구사항 명세서
+### 테이블 정의서
 
+<details>
+<summary style = " font-size:1.3em;">User Service</summary>
+<div markdown="1">
+<img width="960" height="553" alt="13" src="https://github.com/user-attachments/assets/98ad608a-53c7-4ff7-a87c-20426c5b68b2" />
+<img width="958" height="605" alt="14" src="https://github.com/user-attachments/assets/b766b410-3529-4049-bb15-d6fc54c0e97c" />
+<img width="961" height="432" alt="18" src="https://github.com/user-attachments/assets/35c502af-1f15-4e2c-8f6a-844c93ce3647" />
+</div>
+</details>
+
+<details>
+<summary style = " font-size:1.3em;">Annual Leave</summary>
+<div markdown="1">
+<img width="962" height="582" alt="2" src="https://github.com/user-attachments/assets/d3fc0a1b-3939-43c5-9e21-f2e57f672c2c" />
+<img width="966" height="585" alt="3" src="https://github.com/user-attachments/assets/11eaf04a-d7b3-42ce-bd37-cb6e30c94ed7" />
+<img width="957" height="560" alt="8" src="https://github.com/user-attachments/assets/4bac2228-bd88-48e6-affd-b904d36da4ce" />
+</div>
+</details>
+
+<details>
+<summary style = " font-size:1.3em;">Approval System</summary>
+<div markdown="1">
+<img width="958" height="596" alt="4" src="https://github.com/user-attachments/assets/9aba7026-a3c5-419d-8b8e-d5ec02529b14" />
+<img width="958" height="510" alt="5" src="https://github.com/user-attachments/assets/6f6c18aa-d251-4215-9421-cdf5eb20e999" />
+<img width="965" height="510" alt="6" src="https://github.com/user-attachments/assets/57579fdc-5b91-4d89-900a-3c0cfd5d58c5" />
+<img width="973" height="463" alt="7" src="https://github.com/user-attachments/assets/4c7c28e7-5f8d-41ab-8fa9-314355f85a95" />
+</div>
+</details>
+
+<details>
+<summary style = " font-size:1.3em;">Communication</summary>
+<div markdown="1">
+<img width="962" height="578" alt="10" src="https://github.com/user-attachments/assets/e92b3cae-30f6-416b-a26b-260474841c3d" />
+<img width="957" height="575" alt="16" src="https://github.com/user-attachments/assets/304267a5-f55e-4a55-ba6a-c3457876f99b" />
+<img width="967" height="472" alt="17" src="https://github.com/user-attachments/assets/a1803911-5c42-4f4c-baa7-b10a8629d2a8" />
+</div>
+</details>
+
+<details>
+<summary style = " font-size:1.3em;">Resource Reservation</summary>
+<div markdown="1">
+<img width="960" height="461" alt="9" src="https://github.com/user-attachments/assets/5e2af3c3-2568-4b4b-9cb6-f3ca29241448" />
+<img width="966" height="460" alt="11" src="https://github.com/user-attachments/assets/ca8c83fe-311e-4664-b533-5c46a97e31d9" />
+<img width="963" height="475" alt="12" src="https://github.com/user-attachments/assets/e80d90e7-4e63-4269-9be7-20b4131e2dc9" />
+<img width="967" height="578" alt="19" src="https://github.com/user-attachments/assets/233c33c0-9825-4c34-aa05-01147cbf580a" />
+<img width="963" height="457" alt="20" src="https://github.com/user-attachments/assets/3facc15c-f964-483c-8c4b-3e20d9e82559" />
+</div>
+</details>
+
+### API 설계서
+
+<details>
+<summary style = " font-size:1.3em;">User Service</summary>
+<div markdown="1">
+<img width="1443" height="713" alt="스크린샷 2025-12-11 오후 2 31 07" src="https://github.com/user-attachments/assets/650ffb80-6729-4cd2-903e-441fb0b103ab" />
+</div>
+</details>
+
+<details>
+<summary style = " font-size:1.3em;">Annual Leave</summary>
+<div markdown="1">
+<img width="1445" height="661" alt="스크린샷 2025-12-11 오후 2 30 28" src="https://github.com/user-attachments/assets/84f46498-cca4-4010-b182-919baa5120e9" />
+</div>
+</details>
+
+<details>
+<summary style = " font-size:1.3em;">Approval System</summary>
+<div markdown="1">
+<img width="1455" height="905" alt="스크린샷 2025-12-11 오후 2 30 18" src="https://github.com/user-attachments/assets/2273f579-f2a8-4479-8ca8-edb699653957" />
+</div>
+</details>
+
+<details>
+<summary style = " font-size:1.3em;">Communication</summary>
+<div markdown="1">
+<img width="1450" height="631" alt="스크린샷 2025-12-11 오후 2 30 37" src="https://github.com/user-attachments/assets/4c9e0356-c9f3-4f21-a459-0571b512cd65" />
+</div>
+</details>
+
+<details>
+<summary style = " font-size:1.3em;">Resource Reservation</summary>
+<div markdown="1">
+<img width="1329" height="904" alt="스크린샷 2025-12-11 오후 3 20 24" src="https://github.com/user-attachments/assets/b252d46b-3b60-472a-acc6-9110cf480a46" />
+<img width="1325" height="743" alt="스크린샷 2025-12-11 오후 3 20 16" src="https://github.com/user-attachments/assets/cb5c0d49-55a5-4cdd-99f3-21e20de727fa" />
+</div>
+</details>
+
+### WBS
+<img width="2339" height="1653" alt="백엔드 2조-1" src="https://github.com/user-attachments/assets/b0a14e97-5ed6-4f1d-a7c7-1bfdf9edcb31" />
 
 </br>
 
@@ -398,6 +487,106 @@ develop & main branch로 merge할 때에는 pull request가 필요합니다. pul
 
 [feat] 약속 잡기 API 구현
 <br/>[chore] spring data JPA 의존성 추가
+
+</br>
+
+----
+
+</br>
+
+## 8. 프로젝트 기능
+### 보안 및 권한
+- 직원 등록 및 해제
+- 로그인, 로그아웃, 토큰 리프레시
+- JWT 발급으로 API 접근 제어
+- 직급별 접근 권한 부여
+### 근태/연차 관리
+- 출퇴근 기록
+- 연차 차감
+- 날짜/시간 계산 로직으로 연차 계산
+### 전자결재
+- 휴가 기안서 작성/상신
+- 순차 승인으로 결재 라인 관리
+- 동시성 제어로 동시 승인 및 수정 방지
+### 자원(회의실/법인차량/비품) 예약
+- 자원 관리
+- 중복 예약 방지
+- 기간 중복 방지
+- 예약 충돌 방지
+### 게시판/공지사항
+- 공지사항 게시
+- 게시판
+- 댓글/대댓글
+
+</br>
+
+----
+
+</br>
+
+## 9. 회고
+
+<details>
+<summary style = " font-size:1.3em;">강윤혜</summary>
+<div markdown="1">
+
+</div>
+</details>
+
+<details>
+<summary style = " font-size:1.3em;">김채우</summary>
+<div markdown="1">
+
+</div>
+</details>
+
+<details>
+<summary style = " font-size:1.3em;">윤홍석</summary>
+<div markdown="1">
+
+</div>
+</details>
+
+<details>
+<summary style = " font-size:1.3em;">송형욱</summary>
+<div markdown="1">
+
+</div>
+</details>
+
+<details>
+<summary style = " font-size:1.3em;">진희헌</summary>
+<div markdown="1">
+
+</div>
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 </div>
 </details>
