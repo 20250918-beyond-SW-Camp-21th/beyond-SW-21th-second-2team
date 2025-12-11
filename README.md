@@ -1,3 +1,44 @@
+# 사내 전자결재 시스템 ON:S
+> 휴가, 사내 커뮤니티, 회사 자원 사용 예약까지 한 번에
+
+----
+
+## 목차
+### 1. 팀 소개
+### 2. 프로젝트 개요
+### 3. 유사 서비스
+### 4. 개발 환경
+### 5. 프로젝트 구조
+### 6. 프로젝트 기획
+### 7. 프로젝트 기능
+### 8. 서버
+### 9. 회고
+
+----
+
+## 1. 팀 소개
+<table width="100%">
+  <thead>
+    <tr align="center">
+      <th width="20%">김채우🍇</th>
+      <th width="20%">김세현🍅</th>
+      <th width="20%">김성은🍋</th>
+      <th width="20%">양승재🍊</th>
+      <th width="20%">정하경🍏</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr align="center">
+      <td><img src="https://github.com/user-attachments/assets/95d93ca5-ed6c-42b8-8ab1-54608c255b6f" width="60%" /></td>
+      <td><img src="https://github.com/user-attachments/assets/34156882-bfdf-4536-bdf5-67b5c139e4ca" width="60%" /></td>
+      <td><img src="https://github.com/user-attachments/assets/0e7cb364-3ce2-4729-87f9-94ba1eb31af9" width="60%" /></td>
+      <td><img src="https://github.com/user-attachments/assets/dd56732e-3798-4b10-8d32-ef5a3d0da673" width="60%" /></td>
+      <td><img src="https://github.com/user-attachments/assets/068fd2f2-d0e8-4a66-8973-b01502df6976" width="60%" /></td>
+    </tr>
+  </tbody>
+</table>
+
+
 # Back-end
 ## 공통 사항
 - 단위 테스트 작성(service 메소드 별로) : Junit 사용
