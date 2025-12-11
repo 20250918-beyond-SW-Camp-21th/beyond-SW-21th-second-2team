@@ -27,15 +27,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Unit tests for AuthService
- *
- * Testing Strategy:
- * - Uses Mockito to mock dependencies (repositories, password encoder, JWT provider)
- * - Tests each method's success scenarios and failure scenarios
- * - Verifies correct interactions with dependencies
- * - Validates exception handling for authentication failures
- */
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
 
@@ -82,7 +73,7 @@ class AuthServiceTest {
     class LoginTests {
 
         @Test
-        @DisplayName("성공: 올바른 자격 증명으로 로그인하면 토큰을 반환한다")
+        @DisplayName("로그인하면 토큰을 반환한다")
         void login_WithValidCredentials_ReturnsTokenResponse() {
             // Given: Valid user credentials
             when(userRepository.findByEmail(loginRequest.getEmail()))
@@ -117,7 +108,7 @@ class AuthServiceTest {
         }
 
         @Test
-        @DisplayName("실패: 존재하지 않는 이메일로 로그인 시도 시 BadCredentialsException 발생")
+        @DisplayName("존재하지 않는 이메일로 로그인 시도 시 BadCredentialsException 발생")
         void login_WithNonExistentEmail_ThrowsBadCredentialsException() {
             // Given: Email does not exist in database
             when(userRepository.findByEmail(loginRequest.getEmail()))
@@ -133,7 +124,7 @@ class AuthServiceTest {
         }
 
         @Test
-        @DisplayName("실패: 잘못된 비밀번호로 로그인 시도 시 BadCredentialsException 발생")
+        @DisplayName("잘못된 비밀번호로 로그인 시도 시 BadCredentialsException 발생")
         void login_WithIncorrectPassword_ThrowsBadCredentialsException() {
             // Given: User exists but password doesn't match
             when(userRepository.findByEmail(loginRequest.getEmail()))
@@ -152,7 +143,7 @@ class AuthServiceTest {
         }
 
         @Test
-        @DisplayName("성공: 관리자 계정으로 로그인 시 ADMIN 역할로 토큰 생성")
+        @DisplayName("관리자 계정으로 로그인 시 ADMIN 역할로 토큰 생성")
         void login_WithAdminUser_CreatesTokenWithAdminRole() {
             // Given: Admin user credentials
             User adminUser = User.builder()
@@ -189,7 +180,7 @@ class AuthServiceTest {
     }
 
     @Nested
-    @DisplayName("Refresh Token Tests")
+    @DisplayName("토큰 재발급")
     class RefreshTokenTests {
 
         private RefreshToken storedRefreshToken;
@@ -204,7 +195,7 @@ class AuthServiceTest {
         }
 
         @Test
-        @DisplayName("성공: 유효한 리프레시 토큰으로 새로운 액세스 토큰 발급")
+        @DisplayName("유효한 리프레시 토큰으로 새로운 액세스 토큰 발급")
         void refreshToken_WithValidToken_ReturnsNewTokens() {
             // Given: Valid refresh token
             when(jwtTokenProvider.validateToken(testRefreshToken))
@@ -239,7 +230,7 @@ class AuthServiceTest {
         }
 
         @Test
-        @DisplayName("실패: 데이터베이스에 저장되지 않은 리프레시 토큰으로 요청 시 예외 발생")
+        @DisplayName("데이터베이스에 저장되지 않은 리프레시 토큰으로 요청 시 예외 발생")
         void refreshToken_WithNonExistentToken_ThrowsException() {
             // Given: Token is valid but not stored in database
             when(jwtTokenProvider.validateToken(testRefreshToken))
@@ -259,7 +250,7 @@ class AuthServiceTest {
         }
 
         @Test
-        @DisplayName("실패: 저장된 토큰과 제공된 토큰이 일치하지 않으면 예외 발생")
+        @DisplayName("저장된 토큰과 제공된 토큰이 일치하지 않으면 예외 발생")
         void refreshToken_WithMismatchedToken_ThrowsException() {
             // Given: Stored token doesn't match provided token
             String wrongToken = "wrong.refresh.token";
@@ -277,7 +268,7 @@ class AuthServiceTest {
         }
 
         @Test
-        @DisplayName("실패: 만료된 리프레시 토큰으로 요청 시 예외 발생")
+        @DisplayName("만료된 리프레시 토큰으로 요청 시 예외 발생")
         void refreshToken_WithExpiredToken_ThrowsException() {
             // Given: Refresh token is expired
             RefreshToken expiredToken = RefreshToken.builder()
@@ -300,7 +291,7 @@ class AuthServiceTest {
         }
 
         @Test
-        @DisplayName("실패: 유효하지 않은 사용자로 리프레시 토큰 요청 시 예외 발생")
+        @DisplayName("유효하지 않은 사용자로 리프레시 토큰 요청 시 예외 발생")
         void refreshToken_WithNonExistentUser_ThrowsException() {
             // Given: Token is valid but user doesn't exist
             when(jwtTokenProvider.validateToken(testRefreshToken))
@@ -324,7 +315,7 @@ class AuthServiceTest {
     class LogoutTests {
 
         @Test
-        @DisplayName("성공: 유효한 리프레시 토큰으로 로그아웃하면 토큰이 삭제된다")
+        @DisplayName("유효한 리프레시 토큰으로 로그아웃하면 토큰이 삭제된다")
         void logout_WithValidToken_DeletesRefreshToken() {
             // Given: Valid refresh token
             when(jwtTokenProvider.validateToken(testRefreshToken))
@@ -341,21 +332,5 @@ class AuthServiceTest {
             verify(refreshTokenRepository).deleteById(testUser.getEmail());
         }
 
-        @Test
-        @DisplayName("성공: 로그아웃 시 토큰 검증이 먼저 수행된다")
-        void logout_ValidatesTokenFirst() {
-            // Given: Token that will be validated
-            when(jwtTokenProvider.validateToken(testRefreshToken))
-                    .thenReturn(true);
-            when(jwtTokenProvider.getUsernameFromJWT(testRefreshToken))
-                    .thenReturn(testUser.getEmail());
-
-            // When: User logs out
-            authService.logout(testRefreshToken);
-
-            // Then: Token validation occurs before deletion
-            verify(jwtTokenProvider).validateToken(testRefreshToken);
-            verify(refreshTokenRepository).deleteById(anyString());
-        }
     }
 }

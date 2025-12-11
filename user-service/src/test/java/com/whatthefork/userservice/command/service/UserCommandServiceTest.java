@@ -25,16 +25,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Unit tests for UserCommandService
- *
- * Testing Strategy:
- * - Uses Mockito to mock dependencies (repository, password encoder, model mapper)
- * - Tests each method's success scenarios and failure scenarios
- * - Verifies correct interactions with dependencies
- * - Validates business logic for user registration, deletion, and password changes
- * - Tests role assignment logic (ADMIN vs USER)
- */
 @ExtendWith(MockitoExtension.class)
 class UserCommandServiceTest {
 
@@ -84,7 +74,7 @@ class UserCommandServiceTest {
     class RegisterUserTests {
 
         @Test
-        @DisplayName("성공: 유효한 정보로 일반 사용자 등록 시 USER 역할이 부여된다")
+        @DisplayName("유효한 정보로 일반 사용자 등록 시 USER 역할이 부여된다")
         void registerUser_WithValidInfo_CreatesUserWithUserRole() {
             // Given: Valid user creation request for regular user
             when(userRepository.existsByEmail(userCreateRequest.getEmail()))
@@ -108,7 +98,7 @@ class UserCommandServiceTest {
         }
 
         @Test
-        @DisplayName("성공: 관리자 플래그가 true인 경우 ADMIN 역할이 부여된다")
+        @DisplayName("admin값이 true인 경우 ADMIN 역할이 부여된다")
         void registerUser_WithAdminFlag_CreatesUserWithAdminRole() {
             // Given: User creation request with admin flag
             UserCreateRequest adminRequest = new UserCreateRequest(
@@ -138,7 +128,7 @@ class UserCommandServiceTest {
         }
 
         @Test
-        @DisplayName("성공: 부서장 플래그가 올바르게 설정된다")
+        @DisplayName("부서장 값이 올바르게 설정된다")
         void registerUser_WithDeptLeaderFlag_SetsCorrectFlag() {
             // Given: User creation request with dept leader flag
             UserCreateRequest deptLeaderRequest = new UserCreateRequest(
@@ -167,7 +157,7 @@ class UserCommandServiceTest {
         }
 
         @Test
-        @DisplayName("성공: 비밀번호가 암호화되어 저장된다")
+        @DisplayName("비밀번호가 암호화되어 저장된다")
         void registerUser_EncodesPassword() {
             // Given: Valid user creation request
             when(userRepository.existsByEmail(userCreateRequest.getEmail()))
@@ -187,7 +177,7 @@ class UserCommandServiceTest {
         }
 
         @Test
-        @DisplayName("실패: 중복된 이메일로 등록 시도 시 DuplicateEmailException 발생")
+        @DisplayName("중복된 이메일로 등록 시도 시 DuplicateEmailException 발생")
         void registerUser_WithDuplicateEmail_ThrowsDuplicateEmailException() {
             // Given: Email already exists in database
             when(userRepository.existsByEmail(userCreateRequest.getEmail()))
@@ -204,7 +194,7 @@ class UserCommandServiceTest {
         }
 
         @Test
-        @DisplayName("성공: 모든 사용자 정보 필드가 올바르게 저장된다")
+        @DisplayName("모든 사용자 정보 필드가 올바르게 저장된다")
         void registerUser_SavesAllUserFields() {
             // Given: Complete user creation request
             when(userRepository.existsByEmail(userCreateRequest.getEmail()))
@@ -232,7 +222,7 @@ class UserCommandServiceTest {
     class DeleteUserTests {
 
         @Test
-        @DisplayName("성공: 존재하는 사용자 ID로 삭제 시 사용자가 삭제된다")
+        @DisplayName("존재하는 사용자 ID로 삭제 시 사용자가 삭제된다")
         void deleteUser_WithExistingUserId_DeletesUser() {
             // Given: Existing user in database
             Long userId = 1L;
@@ -248,7 +238,7 @@ class UserCommandServiceTest {
         }
 
         @Test
-        @DisplayName("실패: 존재하지 않는 사용자 ID로 삭제 시도 시 UserNotFoundException 발생")
+        @DisplayName("존재하지 않는 사용자 ID로 삭제 시도 시 UserNotFoundException 발생")
         void deleteUser_WithNonExistentUserId_ThrowsUserNotFoundException() {
             // Given: User does not exist in database
             Long userId = 999L;
@@ -264,21 +254,6 @@ class UserCommandServiceTest {
             verify(userRepository, never()).delete(any());
         }
 
-        @Test
-        @DisplayName("성공: 삭제 전에 사용자 존재 여부를 확인한다")
-        void deleteUser_ChecksUserExistsBeforeDeleting() {
-            // Given: Existing user
-            Long userId = 1L;
-            when(userRepository.findById(userId))
-                    .thenReturn(Optional.of(testUser));
-
-            // When: User deletion is performed
-            userCommandService.deleteUser(userId);
-
-            // Then: User existence is checked before deletion
-            verify(userRepository).findById(userId);
-            verify(userRepository).delete(any());
-        }
     }
 
     @Nested
@@ -298,7 +273,7 @@ class UserCommandServiceTest {
         }
 
         @Test
-        @DisplayName("실패: 잘못된 현재 비밀번호로 변경 시도 시 BadCredentialsException 발생")
+        @DisplayName("잘못된 현재 비밀번호로 변경 시도 시 BadCredentialsException 발생")
         void changeOwnPassword_WithIncorrectCurrentPassword_ThrowsBadCredentialsException() {
             // Given: User exists but current password doesn't match
             Long userId = 1L;
@@ -318,7 +293,7 @@ class UserCommandServiceTest {
         }
 
         @Test
-        @DisplayName("실패: 존재하지 않는 사용자 ID로 비밀번호 변경 시도 시 UserNotFoundException 발생")
+        @DisplayName("존재하지 않는 사용자 ID로 비밀번호 변경 시도 시 UserNotFoundException 발생")
         void changeOwnPassword_WithNonExistentUserId_ThrowsUserNotFoundException() {
             // Given: User does not exist
             Long userId = 999L;
@@ -336,7 +311,7 @@ class UserCommandServiceTest {
         }
 
         @Test
-        @DisplayName("성공: 새 비밀번호가 암호화되어 저장된다")
+        @DisplayName("새 비밀번호가 암호화되어 저장된다")
         void changeOwnPassword_EncodesNewPassword() {
             // Given: Valid password change request
             Long userId = 1L;
