@@ -3,7 +3,6 @@ package com.whatthefork.resourcereservation.resource.service;
 import com.whatthefork.resourcereservation.exception.BusinessException;
 import com.whatthefork.resourcereservation.exception.ErrorCode;
 import com.whatthefork.resourcereservation.resource.dto.request.create.CreateReservationRequest;
-import com.whatthefork.resourcereservation.resource.dto.request.update.UpdateCorporateCarRequest;
 import com.whatthefork.resourcereservation.resource.dto.request.update.UpdateReservationRequest;
 import com.whatthefork.resourcereservation.resource.dto.response.CanceledReservationResponse;
 import com.whatthefork.resourcereservation.resource.dto.response.ConferenceRoomResponse;
@@ -18,6 +17,7 @@ import com.whatthefork.resourcereservation.resource.entity.ConferenceRoom;
 import com.whatthefork.resourcereservation.resource.entity.CorporateCar;
 import com.whatthefork.resourcereservation.resource.entity.Reservation;
 import com.whatthefork.resourcereservation.resource.entity.Supplies;
+import com.whatthefork.resourcereservation.resource.enums.ResourceCategory;
 import com.whatthefork.resourcereservation.resource.repository.CanceledReservationRepository;
 import com.whatthefork.resourcereservation.resource.repository.ConferenceRoomRepository;
 import com.whatthefork.resourcereservation.resource.repository.CorporateCarRepository;
@@ -31,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
 
 @Slf4j
 @Service
@@ -220,5 +219,19 @@ public class ReservationService {
                         .category(reservationRequest.category())
                         .build()
         ));
+    }
+
+    public List<ReservationResponse> getMyReservationsByCategory(Long userId, ResourceCategory category) {
+
+        return reservationRepository.findAllByUserIdAndCategory(userId, category).stream()
+                .map(ReservationResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<ReservationResponse> getMyReservations(Long userId) {
+
+        return reservationRepository.findAllByUserId(userId).stream()
+                .map(ReservationResponse::new)
+                .collect(Collectors.toList());
     }
 }
