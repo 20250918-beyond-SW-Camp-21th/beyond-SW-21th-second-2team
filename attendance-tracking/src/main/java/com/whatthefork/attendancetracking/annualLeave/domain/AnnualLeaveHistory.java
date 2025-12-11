@@ -50,13 +50,12 @@ public class AnnualLeaveHistory {
     private LocalDateTime updatedAt;
 
     @Builder
-    public AnnualLeaveHistory(Long memberId, LocalDate startDate, LocalDate endDate, Long approverId) {
+    public AnnualLeaveHistory(Long memberId,Integer usedLeave, LocalDate startDate, LocalDate endDate, Long approverId) {
         this.memberId = memberId;
+        this.usedLeave = usedLeave;
         this.startDate = startDate;
         this.endDate = endDate;
         this.approverId = approverId;
-
-        this.usedLeave = (int)ChronoUnit.DAYS.between(startDate, endDate) + 1;
     }
 
 }
