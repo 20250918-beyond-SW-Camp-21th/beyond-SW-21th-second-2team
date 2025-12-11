@@ -7,7 +7,6 @@ import com.whatthefork.approvalsystem.domain.ApprovalDocument;
 import com.whatthefork.approvalsystem.domain.ApprovalHistory;
 import com.whatthefork.approvalsystem.domain.ApprovalLine;
 import com.whatthefork.approvalsystem.domain.ApprovalReferrer;
-import com.whatthefork.approvalsystem.domain.member.MemberRepository;
 import com.whatthefork.approvalsystem.dto.request.CreateDocumentRequestDto;
 import com.whatthefork.approvalsystem.dto.request.UpdateDocumentRequestDto;
 import com.whatthefork.approvalsystem.dto.response.ApprovalLineResponseDto;
@@ -41,9 +40,9 @@ public class DocumentService {
     private final ApprovalLineRepository approvalLineRepository;
     private final ApprovalHistoryRepositoy approvalHistoryRepositoy;
     private final ApprovalReferrerRepository approvalReferrerRepository;
-    private final MemberRepository memberRepository;
     private final UserFeignClient userFeignClient;
 
+    /* 기안 작성 */
     @Transactional
     public Long createDocument(String memberIdStr, CreateDocumentRequestDto requestDto) {
 
@@ -54,7 +53,7 @@ public class DocumentService {
         List<Long> approvalIds = requestDto.getApproverIds();
         validateApproverList(approvalIds, memberId);
 
-        // 기안 작성
+        // 문서 작성
         ApprovalDocument approvalDocument = ApprovalDocument.builder()
                         .drafter(memberId)
                         .drafterName(drafterName)
@@ -100,6 +99,7 @@ public class DocumentService {
         return savedDoc.getId();
     }
 
+    /* 기안 수정 */
     @Transactional
     public void updateDocument(Long memberId, Long docId, UpdateDocumentRequestDto requestDto) {
         List<Long> approvalIds = requestDto.getApproverIds();
@@ -128,12 +128,14 @@ public class DocumentService {
         createApprovalLines(docId, approvalIds);
     }
 
+    /* 기안 삭제 */
     @Transactional
     public void deleteDocument(Long userId, Long docId) {
         ApprovalDocument approvalDocument = validateDeleteAuthority(userId, docId);
         approvalDocument.deleteDocument();
     }
 
+    /* 기안 상세 조회 */
     @Transactional(readOnly = true)
     public DocumentDetailResponseDto readDetailDocument(String memberIdStr, Long docId) {
         Long memberId = Long.parseLong(memberIdStr);
@@ -188,9 +190,9 @@ public class DocumentService {
                 .build();
     }
 
+    /* 결재 로그 작성 */
     @Transactional
     public void writeReadHistory(Long docId, String memberIdStr) {
-
         Long memberId = Long.valueOf(memberIdStr);
 
         // 문서가 존재하는지
@@ -229,6 +231,7 @@ public class DocumentService {
         approvalHistoryRepositoy.save(approvalHistory);
     }
 
+    /* 임시 저장함 */
     @Transactional(readOnly = true)
     public Page<DocumentListResponseDto> getTempDocumentList(Long memberId, Pageable pageable) {
         Page<ApprovalDocument> documentList = approvalDocumentRepository.findByDocStatusAndDrafter(DocStatusEnum.TEMP, memberId, pageable);
@@ -236,6 +239,7 @@ public class DocumentService {
         return getResponseDto(documentList);
     }
 
+    /* 진행중인 문서 */
     @Transactional(readOnly = true)
     public Page<DocumentListResponseDto> getProgressDocumentList(Long memberId, Pageable pageable) {
         Page<ApprovalDocument> documentList = approvalDocumentRepository.findByDocStatusAndDrafter(DocStatusEnum.IN_PROGRESS, memberId, pageable);
@@ -243,6 +247,7 @@ public class DocumentService {
         return getResponseDto(documentList);
     }
 
+    /* 종결된 문서 */
     @Transactional(readOnly = true)
     public Page<DocumentListResponseDto> getClosedDocumentList(Long memberId, Pageable pageable) {
         List<DocStatusEnum> statuses = Arrays.asList(DocStatusEnum.APPROVED, DocStatusEnum.REJECTED);
@@ -334,10 +339,16 @@ public class DocumentService {
             throw new BusinessException(ErrorCode.DRAFTER_EQUALS_APPROVER);
         }
 
-        long existingApproverCount = memberRepository.countAllByIdIn(approvalIds);
+        for (Long approverId : approvalIds) {
+            try {
+                ApiResponse<UserDetailResponse> response = userFeignClient.findUserDetail(approverId);
 
-        if (existingApproverCount != approvalIds.size()) {
-            throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
+                if (response == null || response.getData() == null || response.getData().getUser() == null) {
+                    throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
+                }
+            } catch (Exception e) {
+                throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
+            }
         }
     }
 

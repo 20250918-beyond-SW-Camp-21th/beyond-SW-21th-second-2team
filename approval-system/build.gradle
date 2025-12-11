@@ -44,6 +44,10 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
 //    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.7.0'
+    // https://mvnrepository.com/artifact/junit/junit
+    testImplementation 'junit:junit:4.12'
+    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.13.4'
 
 }
 dependencyManagement {

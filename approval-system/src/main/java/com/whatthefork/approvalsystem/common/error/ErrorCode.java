@@ -30,7 +30,7 @@ public enum ErrorCode {
 
     // Auth
     NOT_DRAFTER(HttpStatus.FORBIDDEN, "A001", "본인의 문서만 수정/삭제할 수 있습니다."),
-    NO_READ_AUTHORIZATION(HttpStatus.BAD_REQUEST, "A002", "문서 열람의 권한이 없습니다."),
+    NO_READ_AUTHORIZATION(HttpStatus.FORBIDDEN, "A002", "문서 열람의 권한이 없습니다."),
 
     // Client
     ANNUAL_LEAVE_FAILURE(HttpStatus.BAD_REQUEST, "C001", "Feign Client 전송에 실패하였습니다.");

@@ -25,11 +25,7 @@ public class ApprovalService {
     private final ApprovalLineRepository approvalLineRepository;
     private final AnnualLeaveFeignClient annualLeaveFeignClient;
 
-/* 상신 (기안자)
- 권한: 기안자만 가능하며, DocStatus가 TEMP일 때만 허용
- ApprovalDocument: DocStatus 변경 (TEMP -> IN_PROGRESS), CurrentSequence = 1로 설정.
- ApprovalHistory: SUBMIT 로그 기록 (기존 CREATE 로그는 유지)
- 상신 취소 : 첫 번째 결재자가 처리 전이라면 IN_PROGRESS -> TEMP로 복귀 가능.*/
+    /* 상신 (기안자) */
     @Transactional
     public void submitApproval(Long docId, Long memberId) {
         ApprovalDocument document = validateSubmitAuthority(docId, memberId);
@@ -47,6 +43,7 @@ public class ApprovalService {
         approvalHistoryRepositoy.save(approvalHistory);
     }
 
+    /* 상신 취소 (기안자) */
     @Transactional
     public void cancelSubmit(Long docId, Long memberId) {
         ApprovalDocument document = validateSubmitAuthority(docId, memberId);
@@ -82,6 +79,7 @@ public class ApprovalService {
 
         }
 
+    /* 기안 결재 */
     @Transactional
     public void approveDocument(Long docId, Long memberId) {
 
@@ -128,14 +126,9 @@ public class ApprovalService {
         }
     }
 
+    /* 기안 반려 */
     @Transactional
     public void rejectDocument(Long docId, Long memberId) {
-        /*
-        * 1. Document 에서 현재 시퀀스를 가져와 line의 sequence로 currentsequence에 해당하는 멤버를 불러온다. (lineRepository 활용) -> 승인과 동일
-        * 2. Line에서 Status WAIT에서 REJECTED로 변경 후 approvedAt 기록 (Builder 객체 생성 시 자동 부여)
-        * 3. Document docStatus를 변경 (REJECTED) 후 결재 종료
-        * 4. History REJECT 로그 기록
-        * */
         ApprovalDocument document = approvalDocumentRepository.findById(docId).orElseThrow(
                 () -> new BusinessException(ErrorCode.DOCUMENT_NOT_FOUND)
         );
@@ -167,8 +160,6 @@ public class ApprovalService {
     }
 
     public ApprovalLine validateApprovalLine(Long docId, int currentSequence, Long memberId) {
-        // 현재 문서의 결재선의 sequence가 현재 문서의 CurrentSequence인 approver를 찾아내야 함
-        // 전달 받은 결재자와 결재선의 sequence에 있는 결재자가 다를 경우
         ApprovalLine currentLine = approvalLineRepository.findByDocumentAndSequenceAndApprover(docId, currentSequence, memberId).orElseThrow(
                 () -> new BusinessException(ErrorCode.NOT_MATCH_APPROVER)
         );
