@@ -5,6 +5,7 @@ import com.whatthefork.resourcereservation.exception.BusinessException;
 import com.whatthefork.resourcereservation.exception.ErrorCode;
 import com.whatthefork.resourcereservation.resource.dto.request.create.CreateReservationRequest;
 import com.whatthefork.resourcereservation.resource.dto.request.update.UpdateReservationRequest;
+import com.whatthefork.resourcereservation.resource.enums.ResourceCategory;
 import com.whatthefork.resourcereservation.resource.service.ReservationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,8 +22,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Optional;
 
 @Tag(name = "Reservation", description = "회의실 API (추가, 수정, 삭제, 조회")
 @RestController
@@ -55,6 +54,30 @@ public class ReservationController {
     public ResponseEntity<ApiResponse> getAllReservations() {
 
         return ResponseEntity.ok(ApiResponse.success(reservationService.getAllReservations()));
+    }
+
+    // 카테고리에 따른 내 예약 목록 확인
+    @Operation(summary = "카테고리에 따른 내 예약 확인", description = "카테고리에 따른 사용자 본인의 예약 조회")
+    @PreAuthorize("hasRole('ADMIN') || reservationSecurity.isReservationOwner(principal.username, #id)")
+    @GetMapping("/{id}/{category}")
+    public ResponseEntity<ApiResponse> getMyReservationByCategory(@PathVariable Long id, @PathVariable ResourceCategory category) {
+
+        String userName = getUserId();
+        Long userId = Long.parseLong(userName);
+
+        return ResponseEntity.ok(ApiResponse.success(reservationService.getMyReservationsByCategory(userId, category)));
+    }
+
+    // 내 예약 목록 확인
+    @Operation(summary = "내 예약 확인", description = "사용자 본인의 예약 조회")
+    @PreAuthorize("hasRole('ADMIN') || reservationSecurity.isReservationOwner(principal.username, #id)")
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse> getMyReservation(@PathVariable Long id) {
+
+        String userName = getUserId();
+        Long userId = Long.parseLong(userName);
+
+        return ResponseEntity.ok(ApiResponse.success(reservationService.getMyReservations(userId)));
     }
 
     // 예약 생성
