@@ -38,6 +38,7 @@ public class AnnualLeaveService {
             throw new BusinessException(ErrorCode.ANNUAL_LEAVE_NOT_FOUND);
         }
 
+
         LocalDate start = LocalDate.of(year, 1, 1);
         LocalDate end = LocalDate.of(year, 12, 31);
 
@@ -92,6 +93,10 @@ public class AnnualLeaveService {
 
         AnnualLeave annualLeave = annualLeaveRepository
                 .findByMemberIdAndYear(requestDto.getMemberId(), requestDto.getStartDate().getYear());
+
+        if (annualLeave == null) {
+            throw new BusinessException(ErrorCode.ANNUAL_LEAVE_NOT_FOUND);
+        }
 
         annualLeave.decreaseAnnual(requestDto.getStartDate(), requestDto.getEndDate());
 

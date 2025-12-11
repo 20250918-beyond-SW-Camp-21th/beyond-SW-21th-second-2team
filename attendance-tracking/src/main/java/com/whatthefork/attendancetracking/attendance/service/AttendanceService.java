@@ -40,24 +40,17 @@ public class AttendanceService {
         LocalDateTime end = today.plusDays(1).atStartOfDay();
 
         LocalTime nowTime = now.toLocalTime();
-
         boolean isLate = now.toLocalTime().isAfter(START_TIME);
-
 
         if(attendanceRepository.findAttendanceByUserId(userId,start,end).isPresent()){
             throw new BusinessException(ErrorCode.ATTENDANCE_ALREADY_CHECKED_IN);
         }
-
         if(nowTime.isBefore(CHECK_IN_ALLOWED_TIME)){
             throw new BusinessException(ErrorCode.ATTENDANCE_NOT_CHECK_IN_TIME);
         }
-
-
         int lateMinutes = isLate ?
                 (int)Duration.between(START_TIME,nowTime).toMinutes()
                 : 0;
-
-
         Attendance attendance = Attendance.builder()
                 .userId(userId)
                 .punchInDate(now)
