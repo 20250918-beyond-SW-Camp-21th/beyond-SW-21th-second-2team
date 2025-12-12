@@ -17,6 +17,9 @@ public class UpdateDocumentRequestDto {
     @Size(min = 3, max = 3, message = "결재선은 필수로 3명을 지정해야 합니다.")
     private List<Long> approverIds;
 
+    @Size(max = 5)
+    private List<Long> referenceIds;
+
     @NotBlank(message = "제목은 필수로 입력해야 합니다.")
     private String title;
 

@@ -103,8 +103,12 @@ public class DocumentService {
     @Transactional
     public void updateDocument(Long memberId, Long docId, UpdateDocumentRequestDto requestDto) {
         List<Long> approvalIds = requestDto.getApproverIds();
+        List<Long> referrersIds = requestDto.getReferenceIds();
+
+        // 결재선 검증
         validateApproverList(approvalIds, memberId);
 
+        // 수정 가능한지 검증
         ApprovalDocument approvalDocument = validateUpdateAuthority(memberId, docId);
 
         approvalDocument.updateDocument(
@@ -114,6 +118,7 @@ public class DocumentService {
                 requestDto.getEndVacationDate()
         );
 
+        // 결재 로그 저장
         ApprovalHistory approvalHistory = ApprovalHistory.builder()
                 .document(docId)
                 .actor(memberId)
@@ -126,6 +131,9 @@ public class DocumentService {
 
         approvalLineRepository.deleteByDocumentId(docId);
         createApprovalLines(docId, approvalIds);
+
+        approvalReferrerRepository.deleteByDocumentId(docId);
+        createReferrers(docId, referrersIds);
     }
 
     /* 기안 삭제 */
@@ -152,6 +160,7 @@ public class DocumentService {
         boolean isApprover = approvalLines.stream().anyMatch(line -> line.getApprover().equals(memberId));
         boolean isReferrer = referrers.stream().anyMatch(ref -> ref.getReferrer().equals(memberId));
 
+        // 기안자, 결재자, 참조자만 상세 조회 가능
         if (!isDrafter && !isApprover && !isReferrer) {
             throw new BusinessException(ErrorCode.NO_READ_AUTHORIZATION);
         }
@@ -346,6 +355,7 @@ public class DocumentService {
                 if (response == null || response.getData() == null || response.getData().getUser() == null) {
                     throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
                 }
+
             } catch (Exception e) {
                 throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
             }
@@ -370,8 +380,24 @@ public class DocumentService {
         }
     }
 
-    private String getUserName(Long userId) {
+    private void createReferrers(Long docId, List<Long> referrersIds) {
 
+        if(!approvalDocumentRepository.existsById(docId)) {
+            throw new BusinessException(ErrorCode.DOCUMENT_NOT_FOUND);
+        }
+
+        for(int i = 0; i < referrersIds.size(); i++) {
+            ApprovalReferrer newReferrers = ApprovalReferrer.builder()
+                    .document(docId)
+                    .referrer(referrersIds.get(i))
+                    .viewedAt(null)
+                    .build();
+
+            approvalReferrerRepository.save(newReferrers);
+        }
+    }
+
+    private String getUserName(Long userId) {
         try {
             ApiResponse<UserDetailResponse> response = userFeignClient.findUserDetail(userId);
 

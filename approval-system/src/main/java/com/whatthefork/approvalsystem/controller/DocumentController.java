@@ -117,7 +117,7 @@ public class DocumentController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-    @Operation(summary = "임시저장 문서함", description = "내가 작성 중인(임시저장) 문서를 조회합니다.")
+    @Operation(summary = "(기안자 메뉴) 임시저장 문서함", description = "내가 작성 중인(임시저장) 문서를 조회합니다.")
     @GetMapping("/drafts")
     public ResponseEntity<ApiResponse> getTempDocumentList(
             @AuthenticationPrincipal String memberId,
@@ -134,7 +134,7 @@ public class DocumentController {
         return ResponseEntity.ok(ApiResponse.success(documentList));
     }
 
-    @Operation(summary = "결재 진행함 (상신)", description = "내가 기안하여 현재 결재가 진행 중인 문서를 조회합니다.")
+    @Operation(summary = "(기안자 메뉴) 결재 진행함 (상신)", description = "내가 기안하여 현재 결재가 진행 중인 문서를 조회합니다.")
     @GetMapping("/progress")
     public ResponseEntity<ApiResponse> getProgressDocumentList(
             @AuthenticationPrincipal String memberId,
@@ -151,7 +151,7 @@ public class DocumentController {
         return ResponseEntity.ok(ApiResponse.success(documentList));
     }
 
-    @Operation(summary = "결재 완료함 (종결)", description = "내가 기안하여 승인 완료되거나 반려된 문서를 조회합니다.")
+    @Operation(summary = "(기안자 메뉴) 결재 완료함 (종결)", description = "내가 기안하여 승인 완료되거나 반려된 문서를 조회합니다.")
     @GetMapping("/closed")
     public ResponseEntity<ApiResponse> getClosedDocumentList(
             @AuthenticationPrincipal String memberId,
@@ -166,7 +166,7 @@ public class DocumentController {
         return ResponseEntity.ok(ApiResponse.success(documentList));
     }
 
-    @Operation(summary = "결재 대기함 (미결)", description = "내가 결재해야 할 차례인 문서를 조회합니다.")
+    @Operation(summary = "(결재자 메뉴) 결재 대기함 (미결)", description = "내가 결재해야 할 차례인 문서를 조회합니다.")
     @GetMapping("/pending")
     public ResponseEntity<ApiResponse> getDocumentsToApprove(
             @AuthenticationPrincipal String memberId,
@@ -185,7 +185,7 @@ public class DocumentController {
         return ResponseEntity.ok(ApiResponse.success(documentList));
     }
 
-    @Operation(summary = "기결재함 (처리완료)", description = "내가 승인하거나 반려 처리한 문서를 조회합니다.")
+    @Operation(summary = "(결재자 메뉴) 기결재함 (처리완료)", description = "내가 승인하거나 반려 처리한 문서를 조회합니다.")
     @GetMapping("/processed")
     public ResponseEntity<ApiResponse> getProcessedDocuments(
             @AuthenticationPrincipal String memberId,
@@ -201,7 +201,7 @@ public class DocumentController {
         return ResponseEntity.ok(ApiResponse.success(documentList));
     }
 
-    @Operation(summary = "참조 문서함", description = "내가 참조자로 지정된 문서를 조회합니다.")
+    @Operation(summary = "(결재자 메뉴) 참조 문서함", description = "내가 참조자로 지정된 문서를 조회합니다.")
     @GetMapping("/referenced")
     public ResponseEntity<ApiResponse> getReferencedDocuments(
             @AuthenticationPrincipal String memberId,

@@ -6,7 +6,6 @@ spring:
     name: gateway-server
   cloud:
     gateway:
-      # [변경됨] 최신 버전에서는 server -> webflux 밑에 routes가 와야 합니다.
       server:
         webflux:
           routes:
