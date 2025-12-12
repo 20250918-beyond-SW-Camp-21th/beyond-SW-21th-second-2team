@@ -45,6 +45,11 @@ public class Supplies {
         return this;
     }
 
+    public Supplies updateCapacity(int capacity) {
+        this.capacity = capacity;
+        return this;
+    }
+
     public Supplies updateAll(UpdateSuppliesRequest suppliesRequest) {
         this.name = suppliesRequest.name();
         this.capacity = suppliesRequest.capacity();

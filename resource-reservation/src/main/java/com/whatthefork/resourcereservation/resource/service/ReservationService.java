@@ -109,20 +109,21 @@ public class ReservationService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
 
         if (supply.isBooked()) {
-            throw new BusinessException(ErrorCode.REDUNDANT_RESERVATION);
+            throw new BusinessException(ErrorCode.NOT_ENOUGH_CAPACITY);
+        } else {
+            supply.updateCapacity(supply.getCapacity() - 1);
+
+            SuppliesResponse suppliesResponse = new SuppliesResponse(supplyRepository
+                    .findById(reservationRequest.resourceId())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND)));
+
+            ReservationAndSupply reservationAndSupply =
+                    new ReservationAndSupply(response, suppliesResponse);
+
+            if (supply.getCapacity() == 0) supply.updateIsBooked(true);
+
+            return reservationAndSupply;
         }
-
-        supply.updateIsBooked(true);
-        supplyRepository.save(supply);
-
-        SuppliesResponse suppliesResponse = new SuppliesResponse(supplyRepository
-                .findById(reservationRequest.resourceId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND)));
-
-        ReservationAndSupply reservationAndSupply =
-                new ReservationAndSupply(response, suppliesResponse);
-
-        return reservationAndSupply;
     }
 
     @Transactional
