@@ -74,10 +74,6 @@ public class AttendanceService {
                 .findTopByUserIdAndPunchOutDateIsNullOrderByPunchInDateDesc(userId)
                 .orElseThrow(()-> new BusinessException(ErrorCode.ATTENDANCE_NOT_CHECKED_IN));
 
-        if(attendanceRepository.findAttendanceByUserIdAndPunchOutDate(userId,attendance.getPunchOutDate())){
-            throw new BusinessException(ErrorCode.ATTENDANCE_ALREADY_CHECKED_OUT);
-        }
-
         LocalDateTime now = LocalDateTime.now();
 
         LocalDate workDate = attendance.getPunchInDate().toLocalDate();
