@@ -1,0 +1,8 @@
+rootProject.name = 'root'
+include 'eureka-server'
+include 'user-service'
+include 'gateway'
+include 'attendance-tracking'
+include 'approval-system'
+include 'resource-reservation'
+include 'communication-and-alarm'
