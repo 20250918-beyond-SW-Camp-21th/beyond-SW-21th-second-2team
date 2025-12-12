@@ -74,8 +74,9 @@ public class ApprovalController {
     @PutMapping("/{docId}/approve")
     public ResponseEntity<ApiResponse> approveDocument(
             @AuthenticationPrincipal String memberId,
-            @PathVariable Long docId) {
-        approvalService.approveDocument(docId, Long.valueOf(memberId));
+            @PathVariable Long docId,
+            String comment) {
+        approvalService.approveDocument(docId, Long.valueOf(memberId),  comment);
         return ResponseEntity.ok(ApiResponse.success("결재 승인"));
     }
 
@@ -93,8 +94,9 @@ public class ApprovalController {
     @PutMapping("/{docId}/reject")
     public ResponseEntity<ApiResponse> rejectDocument(
             @AuthenticationPrincipal String memberId,
-            @PathVariable Long docId) {
-        approvalService.rejectDocument(docId, Long.valueOf(memberId));
+            @PathVariable Long docId,
+            String comment) {
+        approvalService.rejectDocument(docId, Long.valueOf(memberId), comment);
         return ResponseEntity.ok(ApiResponse.success("결재 반려 완료"));
     }
 }
